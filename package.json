@@ -1,0 +1,64 @@
+{
+  "name": "sequelize-vault",
+  "version": "1.0.0",
+  "description": "A Sequelize plugin for easily integrating Hashicorp Vault",
+  "main": "index.js",
+  "types": "lib/types.d.ts",
+  "files": [
+    "MIT-LICENSE",
+    "README.md",
+    "index.js",
+    "lib"
+  ],
+  "directories": {
+    "lib": "lib",
+    "src": "src"
+  },
+  "dependencies": {
+    "axios": "0.16.2",
+    "@types/sequelize": "4.27.5",
+    "@types/node": "^8.0.32"
+  },
+  "devDependencies": {
+    "ava": "^0.22.0",
+    "nsp": "^2.8.1",
+    "coveralls": "^3.0.0",
+    "nyc": "^11.2.1",
+    "tslint": "^5.7.0",
+    "tslint-microsoft-contrib": "^5.0.1",
+    "typescript": "^2.5.3"
+  },
+  "engines": {
+    "node": ">=8.4.0"
+  },
+  "ava": {
+    "files": [
+      "lib/**/*.test.js"
+    ]
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf lib",
+    "ci": "npm install && npm run lint && npm run cov && nsp check",
+    "test": "npm run build && ava -v",
+    "cov": "npm run build && nyc ava",
+    "lint": "tslint -p tsconfig.json -c tslint.json src/**/*.ts",
+    "preversion": "npm run clean && npm run build && npm test",
+    "postversion": "git push origin --tags",
+    "prepublishOnly": "npm run clean && npm run build && npm test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/linyows/sequelize-vault.git"
+  },
+  "keywords": [
+    "sequelize",
+    "vault"
+  ],
+  "author": "linyows",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/linyows/sequelize-vault/issues"
+  },
+  "homepage": "https://github.com/linyows/sequelize-vault#readme"
+}
