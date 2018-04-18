@@ -35,7 +35,7 @@
     "strictNullChecks": true,
     "stripInternal": false,
     "suppressExcessPropertyErrors": false,
-    "suppressImplicitAnyIndexErrors": false,
+    "suppressImplicitAnyIndexErrors": true,
     "watch": false
   },
   "include": [
