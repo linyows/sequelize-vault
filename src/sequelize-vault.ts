@@ -1,7 +1,7 @@
 import * as Crypto from 'crypto'
 import {Buffer} from 'buffer'
 import 'reflect-metadata'
-import {Sequelize,Model} from 'sequelize-typescript'
+import {Sequelize, Model} from 'sequelize-typescript'
 
 export interface IOptions {
   enabled?: boolean
@@ -16,127 +16,137 @@ const ATTRIBUTES_KEY = 'sequelize:attributes'
 const DEFAULT_SUFFIX = '_encrypted'
 const INMEMORY_ALGORITHM = 'aes-128-cbc'
 const INMEMORY_ENCODING = 'base64'
-const DEV_WARNING = '[sequelize-vault] Using in-memory cipher - this is not secure '
-                  + 'and should never be used in production-like environments!\n'
+const devWMsg = 'this is not secure and should never be used in production-like environments!'
+const DEV_WARNING = `[sequelize-vault] Using in-memory cipher - ${devWMsg}\n`
 
-export default class SequelizeVault<T extends Model<T>> {
-  private static enabled: boolean
-  private static app: string
-  private static token: string
-  private static address: string
-  private static suffix: string
-  private static path: string
+let enabled = process.env.NODE_ENV === 'production'
+let app = 'my-app'
+let token = 'abcd1234'
+let address = 'https://vault.example.com'
+let suffix = DEFAULT_SUFFIX
+let path = 'transit'
 
-  public static shield(model: typeof Model, opt?: IOptions | undefined) {
-    if (!opt) {
-      opt = {}
+export default function shield(model: typeof Model, opt?: IOptions | undefined) {
+  if (opt !== undefined) {
+    if (opt.enabled !== undefined) {
+      enabled = opt.enabled
     }
-    SequelizeVault.enabled = opt.enabled || process.env.NODE_ENV == 'production'
-    SequelizeVault.app = opt.app || 'my-app'
-    SequelizeVault.token = opt.token || 'abcd1234'
-    SequelizeVault.address = opt.address || 'https://vault.example.com'
-    SequelizeVault.suffix = opt.suffix || DEFAULT_SUFFIX
-    SequelizeVault.path = opt.path || 'transit'
-
-    model.afterInit('loadAttributes', SequelizeVault.loadAttributes)
-    model.beforeCreate('persistAttributes', SequelizeVault.persistAttributes)
-    model.beforeUpdate('persistAttributes', SequelizeVault.persistAttributes)
+    if (opt.app !== undefined) {
+      app = opt.app
+    }
+    if (opt.token !== undefined) {
+      token = opt.token
+    }
+    if (opt.address !== undefined) {
+      address = opt.address
+    }
+    if (opt.suffix !== undefined) {
+      suffix = opt.suffix
+    }
+    if (opt.path !== undefined) {
+      path = opt.path
+    }
   }
 
-  public static loadAttributes(sequelize: Sequelize) {
-    console.log(SequelizeVault.enabled)
-    console.log(SequelizeVault.app)
-    console.log(SequelizeVault.token)
-    console.log(SequelizeVault.address)
+  model.afterInit('loadAttributes', loadAttributes)
+  model.beforeCreate('persistAttributes', persistAttributes)
+  model.beforeUpdate('persistAttributes', persistAttributes)
+}
 
-    console.log(typeof sequelize)
-  }
+async function loadAttributes(seq: Sequelize) {
+  const ciphertext = ''
+  const key = buildPath(seq.constructor.name, '')
+  await decrypt(path, key, ciphertext)
+  process.stdout.write(typeof seq)
+}
 
-  public static getAttributes<T extends Model<T>>(ins: Model<T>): object {
-    const data = Reflect.getMetadata(ATTRIBUTES_KEY, ins)
-    return Object.keys(data).reduce((copy, key) => {
+function getAttributes<T extends Model<T>>(ins: Model<T>): object {
+  const data = Reflect.getMetadata(ATTRIBUTES_KEY, ins)
+
+  return Object.keys(data).reduce(
+    (copy, key) => {
       copy[key] = {...data[key]}
+
       return copy
-    }, {})
-  }
+    },
+    {}
+  )
+}
 
-  public static buildPath(table: string, column: string): string {
-    return `${SequelizeVault.app}_${table}_${column}`
-  }
+function buildPath(table: string, column: string): string {
+  return `${app}_${table}_${column}`
+}
 
-  public static async persistAttributes<T extends Model<T>>(ins: Model<T>, options: Object, fn?: Function | undefined): Promise<void> {
-    const attributes = SequelizeVault.getAttributes(ins)
+async function persistAttributes<T extends Model<T>>(ins: Model<T>, _: Object, fn?: Function | undefined): Promise<void> {
+  const attributes = getAttributes(ins)
 
-    for (let attrName of Object.keys(attributes)) {
-      const replacedAttrName = attrName.replace(SequelizeVault.suffix, '')
-      if (replacedAttrName === attrName) { continue }
-      const plaintext = ins.getDataValue(replacedAttrName)
-      if (!plaintext || plaintext === '') {
-        continue
-      }
-      const path = SequelizeVault.path
-      const key = SequelizeVault.buildPath(ins.constructor.name, replacedAttrName)
-      const ciphertext = await SequelizeVault.encrypt(path, key, plaintext)
-      ins.setDataValue(attrName, ciphertext)
-      if (ins.dataValues[replacedAttrName]) { delete ins.dataValues[replacedAttrName] }
-      if (options['fields'][replacedAttrName]) { delete options['fields'][replacedAttrName] }
-      if (options['defaultFields'][replacedAttrName]) { delete options['defaultFields'][replacedAttrName] }
+  for (const attrName of Object.keys(attributes)) {
+    const replacedAttrName = attrName.replace(suffix, '')
+    if (replacedAttrName === attrName) { continue }
+    const plaintext = ins.getDataValue(replacedAttrName)
+    if (!plaintext || plaintext === '') {
+      continue
     }
-
-    Reflect.defineMetadata(ATTRIBUTES_KEY, {...attributes}, ins)
-    return fn ? fn(null, ins) : ins
+    const key = buildPath(ins.constructor.name, replacedAttrName)
+    const ciphertext = await encrypt(path, key, plaintext)
+    ins.setDataValue(attrName, ciphertext)
+    if (ins.dataValues[replacedAttrName]) { delete ins.dataValues[replacedAttrName] }
   }
 
-  public static async encrypt(path: string, key: string, plaintext: string): Promise<string> {
-    if (SequelizeVault.enabled) {
-      return SequelizeVault.encryptByVault(path, key, plaintext)
-    } else {
-      return SequelizeVault.encryptInMemory(path, key, plaintext)
-    }
-  }
+  Reflect.defineMetadata(ATTRIBUTES_KEY, {...attributes}, ins)
 
-  public static async decrypt(path: string, key: string, ciphertext: string): Promise<string> {
-    if (SequelizeVault.enabled) {
-      return SequelizeVault.decryptByVault(path, key, ciphertext)
-    } else {
-      return SequelizeVault.decryptInMemory(path, key, ciphertext)
-    }
-  }
+  return fn !== undefined ? fn(null, ins) : ins
+}
 
-  public static async encryptByVault(path: string, key: string, plaintext: string): Promise<string> {
-    console.log(path)
-    console.log(key)
-    console.log(plaintext)
-    return ''
+async function encrypt(p: string, k: string, plaintext: string): Promise<string> {
+  if (enabled) {
+    return encryptByVault(p, k, plaintext)
+  } else {
+    return encryptInMemory(p, k, plaintext)
   }
+}
 
-  public static async decryptByVault(path: string, key: string, ciphertext: string): Promise<string> {
-    console.log(path)
-    console.log(key)
-    console.log(ciphertext)
-    return ''
+async function decrypt(p: string, k: string, ciphertext: string): Promise<string> {
+  if (enabled) {
+    return decryptByVault(p, k, ciphertext)
+  } else {
+    return decryptInMemory(p, k, ciphertext)
   }
+}
 
-  public static memoryForKey(path: string, key: string): string {
-    const b = Buffer.from(`${path}/${key}`, 'utf8')
-    return b.toString('base64').substr(0,16)
-  }
+async function encryptByVault(p: string, k: string, plaintext: string): Promise<string> {
+  process.stdout.write(token)
+  process.stdout.write(address)
 
-  public static async encryptInMemory(path: string, key: string, plaintext: string): Promise<string> {
-    process.stdout.write(DEV_WARNING)
-    const passowrd = SequelizeVault.memoryForKey(path, key)
-    const cipher = Crypto.createCipher(INMEMORY_ALGORITHM, passowrd)
-    let cipheredText = cipher.update(plaintext, 'utf8', INMEMORY_ENCODING)
-    cipheredText += cipher.final(INMEMORY_ENCODING)
-    return cipheredText
-  }
+  return `${p} - ${k} - ${plaintext}`
+}
 
-  public static async decryptInMemory(path: string, key: string, ciphertext: string): Promise<string> {
-    process.stdout.write(DEV_WARNING)
-    const passowrd = SequelizeVault.memoryForKey(path, key)
-    const decipher = Crypto.createDecipher(INMEMORY_ALGORITHM, passowrd)
-    let decipheredText = decipher.update(ciphertext, INMEMORY_ENCODING, 'utf8')
-    decipheredText += decipher.final('utf8')
-    return decipheredText
-  }
+async function decryptByVault(p: string, k: string, ciphertext: string): Promise<string> {
+  return `${p} - ${k} - ${ciphertext}`
+}
+
+function memoryForKey(p: string, k: string): string {
+  const length = 16
+
+  return Buffer.from(`${p}/${k}`, 'utf8').toString('base64').substr(0, length)
+}
+
+async function encryptInMemory(p: string, k: string, plaintext: string): Promise<string> {
+  process.stdout.write(DEV_WARNING)
+  const passowrd = memoryForKey(p, k)
+  const cipher = Crypto.createCipher(INMEMORY_ALGORITHM, passowrd)
+  let cipheredText = cipher.update(plaintext, 'utf8', INMEMORY_ENCODING)
+  cipheredText += cipher.final(INMEMORY_ENCODING)
+
+  return cipheredText
+}
+
+async function decryptInMemory(p: string, k: string, ciphertext: string): Promise<string> {
+  process.stdout.write(DEV_WARNING)
+  const passowrd = memoryForKey(p, k)
+  const decipher = Crypto.createDecipher(INMEMORY_ALGORITHM, passowrd)
+  let decipheredText = decipher.update(ciphertext, INMEMORY_ENCODING, 'utf8')
+  decipheredText += decipher.final('utf8')
+
+  return decipheredText
 }
