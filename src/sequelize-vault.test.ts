@@ -33,7 +33,7 @@ class User extends Model<User> {
 
 sequelize['queryInterface'].createTable('users', schema)
 sequelize.addModels([User])
-SequelizeVault.shield(User)
+SequelizeVault(User)
 
 test('replace vault attributes before "save" to database', async (t) => {
   const u = User.build({name: 'foobar', email: 'foo@example.com'})
