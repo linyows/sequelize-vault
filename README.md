@@ -13,8 +13,32 @@ A Sequelize plugin for easily integrating [Hashicorp Vault][vault].
 Installation
 ------------
 
+```sh
+$ npm install sequelize-vault
+```
+
 Usage
 -----
+
+```ts
+import {Sequelize, Table, Column, Model} from 'sequelize-typescript'
+import SequelizeVault from 'sequelize-vault'
+
+@Table
+class User extends Model<User> {
+  @Column
+  ssn_encrypted: string
+  @Column
+  ssn: string
+}
+
+sequelize.addModels([User...])
+SequelizeVault(User)
+
+const u = await User.create({ ssn: '123-45-6789' })
+console.log(u.ssn_encrypted)
+// vault:v0:EE3EV8P5hyo9h...
+```
 
 Contribution
 ------------
