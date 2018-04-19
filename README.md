@@ -40,6 +40,11 @@ console.log(u.ssn_encrypted)
 // vault:v0:EE3EV8P5hyo9h...
 ```
 
+Options
+-------
+
+
+
 Contribution
 ------------
 
