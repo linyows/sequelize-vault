@@ -5,6 +5,7 @@
   ],
   "jsRules": {},
   "rules": {
+    "no-import-side-effect": [true, {"ignore-module": "reflect-metadata"}],
     "quotemark": [true, "single"],
     "semicolon": [true, "never"],
     "completed-docs": false,
