@@ -43,7 +43,14 @@ console.log(u.ssn_encrypted)
 Options
 -------
 
-
+Key     | Value
+---     | ---
+enabled | true or false
+app     | my-app
+token   | abcd1234
+address | https://vault.example.com
+suffix  | \_encrypted
+path    | transit
 
 Contribution
 ------------
