@@ -62,6 +62,7 @@ function buildPath(table: string, column: string): string {
   return `${app}_${table}_${column}`
 }
 
+/* tslint:disable:no-string-literal */
 async function persistAttributes(ins: any, options: Object, fn?: Function | undefined): Promise<void> {
   if (options['fields'] !== undefined) {
     for (const field of options['fields']) {
@@ -81,6 +82,7 @@ async function persistAttributes(ins: any, options: Object, fn?: Function | unde
 
   return fn !== undefined ? fn(null, ins) : ins
 }
+/* tslint:enable:no-string-literal */
 
 async function encrypt(p: string, k: string, plaintext: string): Promise<string> {
   if (enabled) {
