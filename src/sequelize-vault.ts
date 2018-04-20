@@ -1,7 +1,7 @@
 import * as Crypto from 'crypto'
 import {Buffer} from 'buffer'
 import 'reflect-metadata'
-import {Sequelize, Model} from 'sequelize-typescript'
+import {Model, DataType} from 'sequelize-typescript'
 
 export interface IOptions {
   enabled?: boolean
@@ -12,7 +12,7 @@ export interface IOptions {
   path?: string
 }
 
-const ATTRIBUTES_KEY = 'sequelize:attributes'
+//const ATTRIBUTES_KEY = 'sequelize:attributes'
 const DEFAULT_SUFFIX = '_encrypted'
 const INMEMORY_ALGORITHM = 'aes-128-cbc'
 const INMEMORY_ENCODING = 'base64'
@@ -26,6 +26,65 @@ let address = 'https://vault.example.com'
 let suffix = DEFAULT_SUFFIX
 let path = 'transit'
 
+export function vaultConfig(options: IOptions) {
+  if (options.enabled !== undefined) {
+    enabled = options.enabled
+  }
+  if (options.app !== undefined) {
+    app = options.app
+  }
+  if (options.token !== undefined) {
+    token = options.token
+  }
+  if (options.address !== undefined) {
+    address = options.address
+  }
+  if (options.suffix !== undefined) {
+    suffix = options.suffix
+  }
+  if (options.path !== undefined) {
+    path = options.path
+  }
+}
+
+export function vaultField(name: string, options?: any | undefined) {
+  if (options === undefined) {
+    options = {}
+  }
+
+  return {
+    ...{
+    type: DataType.VIRTUAL,
+    get: () => {
+      rawGetter(name, this)
+    },
+    set: (value: string) => {
+      rawSetter(name, value, this)
+    },
+    allowNull: true,
+    },
+    ...options,
+  }
+}
+
+export async function rawGetter<T extends Model<T>>(this: Model<T>, name: string, instance: Model<T>): Promise<string> {
+  const raw = instance.getDataValue(name)
+  if (raw && raw !== '') {
+    return raw
+  }
+  const key = buildPath(instance.constructor.name, name)
+  const encrypted = instance.getDataValue(`${name}${suffix}`)
+  return await decrypt(path, key, encrypted)
+}
+
+export async function rawSetter<T extends Model<T>>(name: string, value: string, instance: Model<T>): Promise<void> {
+  instance.setDataValue(name, value)
+  const key = buildPath(instance.constructor.name, name)
+  const ciphertext = await encrypt(path, key, value)
+  instance.setDataValue(`${name}${suffix}`, ciphertext)
+}
+
+/*
 export default function shield(model: typeof Model, opt?: IOptions | undefined) {
   if (opt !== undefined) {
     if (opt.enabled !== undefined) {
@@ -72,11 +131,13 @@ function getAttributes<T extends Model<T>>(ins: Model<T>): object {
     {}
   )
 }
+*/
 
 function buildPath(table: string, column: string): string {
   return `${app}_${table}_${column}`
 }
 
+/*
 async function persistAttributes<T extends Model<T>>(ins: Model<T>, _: Object, fn?: Function | undefined): Promise<void> {
   const attributes = getAttributes(ins)
 
@@ -97,6 +158,7 @@ async function persistAttributes<T extends Model<T>>(ins: Model<T>, _: Object, f
 
   return fn !== undefined ? fn(null, ins) : ins
 }
+*/
 
 async function encrypt(p: string, k: string, plaintext: string): Promise<string> {
   if (enabled) {
