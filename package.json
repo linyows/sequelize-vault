@@ -16,11 +16,9 @@
   },
   "dependencies": {
     "@types/node": "^8.0.32",
-    "@types/sequelize": "4.27.5",
     "axios": "0.16.2",
     "reflect-metadata": "^0.1.9",
-    "sequelize": "^4.37.6",
-    "sequelize-typescript": "^0.6.3"
+    "sequelize": "^4.37.6"
   },
   "devDependencies": {
     "ava": "^0.22.0",
