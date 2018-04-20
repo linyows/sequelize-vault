@@ -2,15 +2,6 @@ import * as Crypto from 'crypto'
 import {Buffer} from 'buffer'
 import 'reflect-metadata'
 
-export interface IOptions {
-  enabled?: boolean
-  app?: string
-  token?: string
-  address?: string
-  suffix?: string
-  path?: string
-}
-
 const DEFAULT_SUFFIX = '_encrypted'
 const INMEMORY_ALGORITHM = 'aes-128-cbc'
 const INMEMORY_ENCODING = 'base64'
@@ -24,48 +15,72 @@ let address = 'https://vault.example.com'
 let suffix = DEFAULT_SUFFIX
 let path = 'transit'
 
-export function shield(model: any, opt?: IOptions | undefined) {
-  if (opt !== undefined) {
-    if (opt.enabled !== undefined) {
-      enabled = opt.enabled
-    }
-    if (opt.app !== undefined) {
-      app = opt.app
-    }
-    if (opt.token !== undefined) {
-      token = opt.token
-    }
-    if (opt.address !== undefined) {
-      address = opt.address
-    }
-    if (opt.suffix !== undefined) {
-      suffix = opt.suffix
-    }
-    if (opt.path !== undefined) {
-      path = opt.path
-    }
-  }
+export interface IOptions {
+  enabled?: boolean
+  app?: string
+  token?: string
+  address?: string
+  suffix?: string
+  path?: string
+}
 
-  model.afterInit('loadAttributes', loadAttributes)
+export function setOptions(options: IOptions): void {
+  if (options.enabled !== undefined) {
+    enabled = options.enabled
+  }
+  if (options.app !== undefined) {
+    app = options.app
+  }
+  if (options.token !== undefined) {
+    token = options.token
+  }
+  if (options.address !== undefined) {
+    address = options.address
+  }
+  if (options.suffix !== undefined) {
+    suffix = options.suffix
+  }
+  if (options.path !== undefined) {
+    path = options.path
+  }
+}
+
+export function shield(model: any, options?: IOptions | undefined) {
+  if (options !== undefined) {
+    setOptions(options)
+  }
+  model.afterFind('loadAttributes', loadAttributes)
   model.beforeCreate('persistAttributes', persistAttributes)
   model.beforeUpdate('persistAttributes', persistAttributes)
 }
 
-async function loadAttributes(seq: any) {
-  const ciphertext = ''
-  const key = buildPath(seq.constructor.name, '')
-  await decrypt(path, key, ciphertext)
-  process.stdout.write(typeof seq)
+async function loadAttributes(ins: any, prop: Object, fn?: Function | undefined): Promise<void> {
+  /* tslint:disable:no-string-literal */
+  if (prop['attributes'] !== undefined) {
+    for (const field of prop['attributes']) {
+      /* tslint:enable:no-string-literal */
+      const replaced = field.replace(suffix, '')
+      if (replaced === field) {
+        continue
+      }
+      const ciphertext = ins.getDataValue(field)
+      if (!ciphertext || ciphertext === '') {
+        continue
+      }
+      const key = buildPath(ins.constructor.name, replaced)
+      const plaintext = await decrypt(path, key, ciphertext)
+      ins.setDataValue(replaced, plaintext)
+    }
+  }
+
+  return fn !== undefined ? fn(null, ins) : ins
 }
 
-function buildPath(table: string, column: string): string {
-  return `${app}_${table}_${column}`
-}
-
-/* tslint:disable:no-string-literal */
 async function persistAttributes(ins: any, options: Object, fn?: Function | undefined): Promise<void> {
+  /* tslint:disable:no-string-literal */
   if (options['fields'] !== undefined) {
     for (const field of options['fields']) {
+      /* tslint:enable:no-string-literal */
       const replaced = field.replace(suffix, '')
       if (replaced === field) {
         continue
@@ -82,7 +97,6 @@ async function persistAttributes(ins: any, options: Object, fn?: Function | unde
 
   return fn !== undefined ? fn(null, ins) : ins
 }
-/* tslint:enable:no-string-literal */
 
 async function encrypt(p: string, k: string, plaintext: string): Promise<string> {
   if (enabled) {
@@ -111,12 +125,6 @@ async function decryptByVault(p: string, k: string, ciphertext: string): Promise
   return `${p} - ${k} - ${ciphertext}`
 }
 
-function memoryForKey(p: string, k: string): string {
-  const length = 16
-
-  return Buffer.from(`${p}/${k}`, 'utf8').toString('base64').substr(0, length)
-}
-
 async function encryptInMemory(p: string, k: string, plaintext: string): Promise<string> {
   process.stdout.write(DEV_WARNING)
   const passowrd = memoryForKey(p, k)
@@ -135,4 +143,14 @@ async function decryptInMemory(p: string, k: string, ciphertext: string): Promis
   decipheredText += decipher.final('utf8')
 
   return decipheredText
+}
+
+export function buildPath(table: string, column: string): string {
+  return `${app}_${table}_${column}`
+}
+
+export function memoryForKey(p: string, k: string): string {
+  const length = 16
+
+  return Buffer.from(`${p}/${k}`, 'utf8').toString('base64').substr(0, length)
 }
