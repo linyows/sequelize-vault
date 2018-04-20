@@ -14,6 +14,8 @@ let token = 'abcd1234'
 let address = 'https://vault.example.com'
 let suffix = DEFAULT_SUFFIX
 let path = 'transit'
+const fields: string[] = []
+let modelName: string = ''
 
 export interface IOptions {
   enabled?: boolean
@@ -46,12 +48,37 @@ export function setOptions(options: IOptions): void {
 }
 
 export function shield(model: any, options?: IOptions | undefined) {
+  modelName = model
   if (options !== undefined) {
     setOptions(options)
   }
+
+  for (const attribute of model.prototype.attributes) {
+    const replaced = attribute.replace(suffix, '')
+    if (replaced === attribute) {
+      continue
+    }
+    fields.push(replaced)
+  }
+
+  model.beforeFind('loadAttributesOnBeforeFind', loadAttributesOnBeforeFind)
   model.afterFind('loadAttributes', loadAttributes)
   model.beforeCreate('persistAttributes', persistAttributes)
   model.beforeUpdate('persistAttributes', persistAttributes)
+}
+
+async function loadAttributesOnBeforeFind(query: any): Promise<void> {
+  if (query.where === undefined) {
+    return
+  }
+
+  for (const f of fields) {
+    if (query.where[f] !== undefined) {
+      const key = buildPath(modelName, f)
+      query.where[`${f}${suffix}`] = await encrypt(path, key, query.where[f])
+      delete query.where[f]
+    }
+  }
 }
 
 async function loadAttributes(ins: any, prop: Object, fn?: Function | undefined): Promise<void> {
