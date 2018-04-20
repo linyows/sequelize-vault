@@ -1,13 +1,14 @@
 Sequelize Vault
 ===============
 
-A Sequelize plugin for easily integrating [Hashicorp Vault][vault].
+A [Sequelize][sequelize] plugin for easily integrating [Hashicorp Vault][vault].
 
 <a href="https://www.npmjs.com/package/sequelize-vault" title="npm"><img src="http://img.shields.io/npm/v/sequelize-vault.svg?style=flat-square"></a>
 <a href="https://travis-ci.org/linyows/sequelize-vault" title="travis"><img src="https://img.shields.io/travis/linyows/sequelize-vault.svg?style=flat-square"></a>
 <a href="https://coveralls.io/github/linyows/sequelize-vault" title="coveralls"><img src="https://img.shields.io/coveralls/linyows/sequelize-vault.svg?style=flat-square"></a>
 <a href="https://github.com/linyows/sequelize-vault/blob/master/LICENSE" title="MIT License"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square"></a>
 
+[sequelize]: http://docs.sequelizejs.com/
 [vault]: https://www.vaultproject.io/
 
 Installation
@@ -20,21 +21,56 @@ $ npm install sequelize-vault
 Usage
 -----
 
+This package transparently encrypts and decrypts columns in `_encrypted` format using Hashicorp Vault.
+
+### Node.js:
+
+```js
+const Sequelize = require('sequelize')
+const Vault = require('sequelize-vault')
+
+const s = new Sequelize({
+  username: 'root',
+  password: '',
+  dialect: 'sqlite',
+  database: 'test',
+})
+const User = s.define('user', {
+  ssn_encrypted: Sequelize.STRING,
+  ssn: Sequelize.VIRTUAL,
+})
+Vault.shield(User)
+
+const u = await User.create({ ssn: '123-45-6789' })
+console.log(u.ssn_encrypted)
+// vault:v0:EE3EV8P5hyo9h...
+```
+
+### TypeScript:
+
 ```ts
 import {Sequelize, Table, Column, Model} from 'sequelize-typescript'
-import SequelizeVault from 'sequelize-vault'
+import * as Vault from 'sequelize-vault'
+
+const s = new Sequelize({
+  username: 'root',
+  password: '',
+  dialect: 'sqlite',
+  database: 'test',
+})
 
 @Table
 class User extends Model<User> {
   @Column
   ssn_encrypted: string
-  @Column
+
+  @Column(DataType.VIRTUAL)
   ssn: string
 }
 
-sequelize.addModels([User...])
-SequelizeVault(User)
+s.addModels([User])
 
+Vault.shield(User)
 const u = await User.create({ ssn: '123-45-6789' })
 console.log(u.ssn_encrypted)
 // vault:v0:EE3EV8P5hyo9h...
