@@ -82,10 +82,8 @@ async function loadAttributesOnBeforeFind(query: any): Promise<void> {
 }
 
 async function loadAttributes(ins: any, prop: Object, fn?: Function | undefined): Promise<void> {
-  /* tslint:disable:no-string-literal */
   if (prop['attributes'] !== undefined) {
     for (const field of prop['attributes']) {
-      /* tslint:enable:no-string-literal */
       const replaced = field.replace(suffix, '')
       if (replaced === field) {
         continue
@@ -104,10 +102,8 @@ async function loadAttributes(ins: any, prop: Object, fn?: Function | undefined)
 }
 
 async function persistAttributes(ins: any, options: Object, fn?: Function | undefined): Promise<void> {
-  /* tslint:disable:no-string-literal */
   if (options['fields'] !== undefined) {
     for (const field of options['fields']) {
-      /* tslint:enable:no-string-literal */
       const replaced = field.replace(suffix, '')
       if (replaced === field) {
         continue

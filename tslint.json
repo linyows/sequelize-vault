@@ -34,6 +34,7 @@
     "no-relative-imports": false,
     "no-unnecessary-initializer": true,
     "no-unsafe-any": false,
+    "no-string-literal": false,
     "prefer-function-over-method": true,
     "prefer-method-signature": true,
     "typedef": [
