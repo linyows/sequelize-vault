@@ -38,22 +38,28 @@ sequelize['queryInterface'].createTable('users', schema)
 Vault.shield(User)
 TD.replace(process.stdout, 'write')
 
-test('replace vault attributes before "save" to database', async (t) => {
+test('replace vault attributes "before save" to database', async (t) => {
   const u = User.build({name: 'foobar', email: 'foo@example.com'})
   await u.save()
   t.is(u.email_encrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
   t.is(u.email, 'foo@example.com')
 })
 
-test('replace vault attributes before "create" to database', async (t) => {
+test('replace vault attributes "before create" to database', async (t) => {
   const u = await User.create({name: 'foobar', email: 'foo@example.com'})
   t.is(u.email_encrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
   t.is(u.email, 'foo@example.com')
 })
 
-test('set vault attributes after "find" to database', async (t) => {
+test('set vault attributes "after find" to database', async (t) => {
   await User.create({name: 'foobaz', email: 'foo@example.com'})
   const u = await User.findOne({where: { name: 'foobaz' }})
+  t.is(u.email, 'foo@example.com')
+})
+
+test('set vault attributes "before find" to database', async (t) => {
+  await User.create({name: 'foobaz', email: 'foo@example.com'})
+  const u = await User.findOne({where: { email: 'foo@example.com' }})
   t.is(u.email, 'foo@example.com')
 })
 
