@@ -62,7 +62,7 @@ export function shield(model: any, options?: IOptions | undefined) {
   }
 
   model.beforeFind('loadAttributesOnBeforeFind', loadAttributesOnBeforeFind)
-  model.afterFind('loadAttributes', loadAttributes)
+  model.afterFind('loadAttributesOnAfterFind', loadAttributesOnAfterFind)
   model.beforeCreate('persistAttributes', persistAttributes)
   model.beforeUpdate('persistAttributes', persistAttributes)
 }
@@ -81,7 +81,7 @@ async function loadAttributesOnBeforeFind(query: any): Promise<void> {
   }
 }
 
-async function loadAttributes(ins: any, prop: Object, fn?: Function | undefined): Promise<void> {
+async function loadAttributesOnAfterFind(ins: any, prop: Object, fn?: Function | undefined): Promise<void> {
   if (prop['attributes'] !== undefined) {
     for (const field of prop['attributes']) {
       const replaced = field.replace(suffix, '')
