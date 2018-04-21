@@ -17,6 +17,7 @@ export interface IConfig {
   address?: string
   suffix?: string
   path?: string
+  timeout?: number
 }
 
 export default class Vault {
@@ -31,6 +32,7 @@ export default class Vault {
   public static address: string = 'https://vault.example.com'
   public static suffix: string = '_encrypted'
   public static path: string = 'transit'
+  public static timeout: number = 3 * 60 * 1000
 
   private pClient: AxiosInstance
 
@@ -71,7 +73,8 @@ export default class Vault {
       token: Vault.token,
       address: Vault.address,
       suffix: Vault.suffix,
-      path: Vault.path
+      path: Vault.path,
+      timeout: Vault.timeout
     }
   }
 
@@ -83,12 +86,8 @@ export default class Vault {
 
   public get client(): AxiosInstance {
     if (this.pClient === undefined) {
-      const min = 3
-      const sec = 60
-      const msec = 1000
-
       this.pClient = Axios.create({
-        timeout: min * sec * msec,
+        timeout: Vault.timeout,
         baseURL: Vault.address,
         headers: {
           'user-agent': 'Vault Client',
