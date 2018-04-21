@@ -28,3 +28,30 @@ Test('#MEMORY_FOR_KEY returns base64 key', async (t) => {
   const m = Vault.MEMORY_FOR_KEY('bar')
   t.is(m, 'dHJhbnNpdC9iYXI=')
 })
+
+Test('#config returns default config', async (t) => {
+  const c = Vault.config
+  const defaults = {
+    address: 'https://vault.example.com',
+    app: 'my-app',
+    enabled: false,
+    path: 'transit',
+    suffix: '_encrypted',
+    token: 'abcd1234'
+  }
+  t.deepEqual(c, defaults)
+})
+
+Test('#config sets attributes as config', async (t) => {
+  Vault.config = { token: 'secret', app: 'foo', address: 'http://vault' }
+  const expect = {
+    address: 'http://vault',
+    app: 'foo',
+    enabled: false,
+    path: 'transit',
+    suffix: '_encrypted',
+    token: 'secret'
+  }
+  const c = Vault.config
+  t.deepEqual(c, expect)
+})
