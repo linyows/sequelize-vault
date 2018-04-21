@@ -90,7 +90,7 @@ export default class Vault {
         timeout: Vault.timeout,
         baseURL: Vault.address,
         headers: {
-          'user-agent': 'Vault Client',
+          'user-agent': Vault.USER_AGENT,
           'X-Vault-Token': Vault.token
         }
       })
