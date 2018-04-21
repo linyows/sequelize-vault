@@ -1,6 +1,8 @@
 import * as Crypto from 'crypto'
+import * as Path from 'path'
 import {Buffer} from 'buffer'
 import 'reflect-metadata'
+import Axios, {AxiosInstance, AxiosResponse} from 'axios'
 
 const DEFAULT_SUFFIX = '_encrypted'
 const INMEMORY_ALGORITHM = 'aes-128-cbc'
@@ -16,6 +18,7 @@ let suffix = DEFAULT_SUFFIX
 let path = 'transit'
 const fields: string[] = []
 let modelName: string = ''
+let client: AxiosInstance
 
 export interface IOptions {
   enabled?: boolean
@@ -52,6 +55,18 @@ export function shield(model: any, options?: IOptions | undefined) {
   if (options !== undefined) {
     setOptions(options)
   }
+
+  const min = 3
+  const sec = 60
+  const msec = 1000
+  client = Axios.create({
+    timeout: min * sec * msec,
+    baseURL: address,
+    headers: {
+      'user-agent': 'Vault Client',
+      'X-Vault-Token': token,
+    }
+  })
 
   for (const attribute of model.prototype.attributes) {
     const replaced = attribute.replace(suffix, '')
@@ -138,14 +153,29 @@ async function decrypt(p: string, k: string, ciphertext: string): Promise<string
 }
 
 async function encryptByVault(p: string, k: string, plaintext: string): Promise<string> {
-  process.stdout.write(token)
-  process.stdout.write(address)
+  if (plaintext === '') {
+    return ''
+  }
 
-  return `${p} - ${k} - ${plaintext}`
+  const route = Path.join(p, 'encrypt', k)
+  const res: AxiosResponse = await client.post(route, {
+    plaintext: Buffer.from(plaintext, 'utf8').toString('base64'),
+  })
+
+  return res.data.ciphertext
 }
 
 async function decryptByVault(p: string, k: string, ciphertext: string): Promise<string> {
-  return `${p} - ${k} - ${ciphertext}`
+  if (ciphertext === '') {
+    return ''
+  }
+
+  const route = Path.join(p, 'decrypt', k)
+  const res: AxiosResponse = await client.post(route, {
+    ciphertext: ciphertext,
+  })
+
+  return Buffer.from(res.data.plaintext, 'utf8').toString('base64')
 }
 
 async function encryptInMemory(p: string, k: string, plaintext: string): Promise<string> {
