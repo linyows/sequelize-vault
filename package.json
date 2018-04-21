@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@types/node": "^8.0.32",
-    "axios": "0.16.2",
+    "axios": "^0.16.2",
     "reflect-metadata": "^0.1.9",
     "sequelize": "^4.37.6"
   },
