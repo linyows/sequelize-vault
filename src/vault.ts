@@ -3,6 +3,13 @@ import * as Path from 'path'
 import {Buffer} from 'buffer'
 import Axios, {AxiosInstance, AxiosResponse} from 'axios'
 
+/* tslint:disable:no-require-imports no-var-requires */
+const pkgJson = require('../package.json')
+/* tslint:enable:no-require-imports no-var-requires */
+const VERSION = pkgJson.version
+const NAME = pkgJson.name
+const PROJECT_URL = pkgJson.homepage
+
 export interface IConfig {
   enabled?: boolean
   app?: string
@@ -16,6 +23,7 @@ export default class Vault {
   public static INMEMORY_ALGORITHM: string = 'aes-128-cbc'
   public static DEV_W_MSG: string = 'this is not secure and should never be used in production-like environments!'
   public static DEV_WARNING: string = `[sequelize-vault] Using in-memory cipher - ${Vault.DEV_W_MSG}\n`
+  public static USER_AGENT: string = `${NAME}/${VERSION} (+${PROJECT_URL}; ${process.version})`
 
   public static enabled: boolean = process.env.NODE_ENV === 'production'
   public static app: string = 'my-app'
