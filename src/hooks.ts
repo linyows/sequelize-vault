@@ -3,7 +3,7 @@ import Vault from './vault'
 const fields: string[] = []
 let modelName: string = ''
 
-export default function shield(model: any) {
+export function shield(model: any) {
   modelName = model
 
   for (const attribute of model.prototype.attributes) {
