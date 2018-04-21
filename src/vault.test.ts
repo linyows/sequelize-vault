@@ -4,12 +4,27 @@ import Vault from './vault'
 
 TD.replace(process.stdout, 'write')
 
-Test('#BuildPath returns path', async (t) => {
+Test('#USER_AGENT includes name, version, url and node.js runtime version', async (t) => {
+  const re = /^sequelize-vault\/\d\.\d\.\d \(\+https:\/\/github.com\/linyows\/sequelize-vault; v\d\.\d\.\d\)$/
+  t.true(re.test(Vault.USER_AGENT))
+})
+
+Test('#ENCRYPT_IN_MEMORY returns encrypted text on memory', async (t) => {
+  const encrypted = await Vault.ENCRYPT_IN_MEMORY('key', 'secret')
+  t.is(encrypted, 'e6iA4LdnZEJYpeGafw8OyQ==')
+})
+
+Test('#DECRYPT_IN_MEMORY returns encrypted text on memory', async (t) => {
+  const decrypted = await Vault.DECRYPT_IN_MEMORY('key', 'e6iA4LdnZEJYpeGafw8OyQ==')
+  t.is(decrypted, 'secret')
+})
+
+Test('#BUILD_PATH returns path for Vault', async (t) => {
   const p = Vault.BUILD_PATH('users', 'name')
   t.is(p, 'my-app_users_name')
 })
 
-Test('#MemoryForKey returns path', async (t) => {
+Test('#MEMORY_FOR_KEY returns base64 key', async (t) => {
   const m = Vault.MEMORY_FOR_KEY('bar')
   t.is(m, 'dHJhbnNpdC9iYXI=')
 })
