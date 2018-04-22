@@ -28,7 +28,7 @@ async function loadAttributesOnBeforeFind(query: any): Promise<void> {
   const vault = new Vault()
 
   for (const f of fields) {
-    if (query.where[f] !== undefined) {
+    if (query.where[f] !== undefined && typeof query.where[f] === 'string') {
       const key = Vault.BUILD_PATH(modelName, f)
       query.where[`${f}${Vault.suffix}`] = await vault.encrypt(key, query.where[f])
       delete query.where[f]
