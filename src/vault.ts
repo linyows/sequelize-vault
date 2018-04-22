@@ -74,6 +74,9 @@ export default class Vault {
   }
 
   public static get defaults(): IConfig {
+    const sec = 180
+    const msec = 1000
+
     return {
       enabled: process.env.NODE_ENV === 'production',
       app: 'my-app',
@@ -81,7 +84,7 @@ export default class Vault {
       address: 'https://vault.example.com',
       suffix: '_encrypted',
       path: 'transit',
-      timeout: 3 * 60 * 1000,
+      timeout: sec * msec,
       ua: Vault.DEFAULT_UA
     }
   }
