@@ -82,6 +82,29 @@ Test('.client sets as a axios instance', async (t) => {
   t.is(v.client.defaults.baseURL, baseURL)
 })
 
+Test('.encrypt calls backend method', async (t) => {
+  const key = 'foo/bar'
+  const pw = 'secret'
+  const encrypted = 'vault:v2:0VHTTBb2EyyNYHsa3XiXsvXOQSLKulH+NqS4eRZdtc2TwQCxqJ7PUipvqQ=='
+  let v: Vault
+  let ciphertext: string
+  class TestEncryptVault extends Vault {}
+
+  Vault.enabled = true
+  TD.replace(TestEncryptVault.prototype, 'encryptByVault', async () => { return encrypted })
+  v = new TestEncryptVault()
+  ciphertext = await v.encrypt(key, pw)
+
+  t.is(ciphertext, encrypted)
+  TD.reset()
+
+  Vault.enabled = false
+  v = new TestEncryptVault()
+  ciphertext = await v.encrypt(key, pw)
+
+  t.is(ciphertext, 'GKQR6G1CtWynueC7MjyI1A==')
+})
+
 Test('.encryptByVault returns encrypted text', async (t) => {
   const encrypted = 'vault:v2:0VHTTBb2EyyNYHsa3XiXsvXOQSLKulH+NqS4eRZdtc2TwQCxqJ7PUipvqQ=='
   const v = new Vault()
