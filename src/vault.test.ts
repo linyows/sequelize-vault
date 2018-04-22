@@ -6,7 +6,7 @@ import Axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
 Test.beforeEach(() => { Vault.RESET() })
 
 Test('#DEFAULT_UA includes name, version, url and node.js runtime version', async (t) => {
-  const re = /^sequelize-vault\/\d\.\d\.\d \(\+https:\/\/github.com\/linyows\/sequelize-vault; v\d\.\d\.\d\)$/
+  const re = /^sequelize-vault\/\d+\.\d+\.\d+ \(\+https:\/\/github.com\/linyows\/sequelize-vault; v\d+\.\d+\.\d+\)$/
   t.true(re.test(Vault.DEFAULT_UA))
 })
 
@@ -71,7 +71,7 @@ Test('.client returns a axios instance', async (t) => {
   t.is(v.client.defaults.baseURL, 'https://vault.example.com')
   t.is(v.client.defaults.timeout, 180000)
   t.is(v.client.defaults.headers['X-Vault-Token'], 'abcd1234')
-  const re = /^sequelize-vault\/\d\.\d\.\d \(\+https:\/\/github.com\/linyows\/sequelize-vault; v\d\.\d\.\d\)$/
+  const re = /^sequelize-vault\/\d+\.\d+\.\d+ \(\+https:\/\/github.com\/linyows\/sequelize-vault; v\d+\.\d+\.\d+\)$/
   t.true(re.test(v.client.defaults.headers['User-Agent']))
 })
 
