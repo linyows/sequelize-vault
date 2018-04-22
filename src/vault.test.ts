@@ -105,6 +105,29 @@ Test('.encrypt calls backend method', async (t) => {
   t.is(ciphertext, 'GKQR6G1CtWynueC7MjyI1A==')
 })
 
+Test('.decrypt calls backend method', async (t) => {
+  const key = 'foo/bar'
+  const pw = 'GKQR6G1CtWynueC7MjyI1A=='
+  const decrypted = 'bXkgc2VjcmV0IGRhdGEK'
+  let v: Vault
+  let plaintext: string
+  class TestDecryptVault extends Vault {}
+
+  Vault.enabled = true
+  TD.replace(TestDecryptVault.prototype, 'decryptByVault', async () => { return decrypted })
+  v = new TestDecryptVault()
+  plaintext = await v.decrypt(key, pw)
+
+  t.is(plaintext, decrypted)
+  TD.reset()
+
+  Vault.enabled = false
+  v = new TestDecryptVault()
+  plaintext = await v.decrypt(key, pw)
+
+  t.is(plaintext, 'secret')
+})
+
 Test('.encryptByVault returns encrypted text', async (t) => {
   const encrypted = 'vault:v2:0VHTTBb2EyyNYHsa3XiXsvXOQSLKulH+NqS4eRZdtc2TwQCxqJ7PUipvqQ=='
   const v = new Vault()
