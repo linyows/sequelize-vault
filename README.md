@@ -79,6 +79,11 @@ console.log(u.ssn_encrypted)
 Options
 -------
 
+```ts
+Vault.app = 'fooapp'
+Vault.address = 'http://master-vault'
+```
+
 Key     | Value
 ---     | ---
 enabled | true or false
@@ -87,6 +92,8 @@ token   | abcd1234
 address | https://vault.example.com
 suffix  | \_encrypted
 path    | transit
+timeout | 3 * 60 * 1000
+ua | sequelize-vault/1.0.0 (+https://github....
 
 Contribution
 ------------
