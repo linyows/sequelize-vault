@@ -18,21 +18,24 @@ export interface IConfig {
   suffix?: string
   path?: string
   timeout?: number
+  ua?: string
 }
 
 export default class Vault {
   public static INMEMORY_ALGORITHM: string = 'aes-128-cbc'
   public static DEV_W_MSG: string = 'this is not secure and should never be used in production-like environments!'
   public static DEV_WARNING: string = `[sequelize-vault] Using in-memory cipher - ${Vault.DEV_W_MSG}\n`
-  public static USER_AGENT: string = `${NAME}/${VERSION} (+${PROJECT_URL}; ${process.version})`
+  public static DEFAULT_UA: string = `${NAME}/${VERSION} (+${PROJECT_URL}; ${process.version})`
 
-  public static enabled: boolean = process.env.NODE_ENV === 'production'
-  public static app: string = 'my-app'
-  public static token: string = 'abcd1234'
-  public static address: string = 'https://vault.example.com'
-  public static suffix: string = '_encrypted'
-  public static path: string = 'transit'
-  public static timeout: number = 3 * 60 * 1000
+  // config
+  public static enabled: boolean
+  public static app: string
+  public static token: string
+  public static address: string
+  public static suffix: string
+  public static path: string
+  public static timeout: number
+  public static ua: string
 
   private pClient: AxiosInstance
 
@@ -66,6 +69,23 @@ export default class Vault {
     return Buffer.from(`${Vault.path}/${key}`, 'utf8').toString('base64').substr(0, length)
   }
 
+  public static RESET(): void {
+    Vault.config = Vault.defaults
+  }
+
+  public static get defaults(): IConfig {
+    return {
+      enabled: process.env.NODE_ENV === 'production',
+      app: 'my-app',
+      token: 'abcd1234',
+      address: 'https://vault.example.com',
+      suffix: '_encrypted',
+      path: 'transit',
+      timeout: 3 * 60 * 1000,
+      ua: Vault.DEFAULT_UA
+    }
+  }
+
   public static get config(): IConfig {
     return {
       enabled: Vault.enabled,
@@ -74,7 +94,8 @@ export default class Vault {
       address: Vault.address,
       suffix: Vault.suffix,
       path: Vault.path,
-      timeout: Vault.timeout
+      timeout: Vault.timeout,
+      ua: Vault.ua
     }
   }
 
@@ -90,7 +111,7 @@ export default class Vault {
         timeout: Vault.timeout,
         baseURL: Vault.address,
         headers: {
-          'user-agent': Vault.USER_AGENT,
+          'User-Agent': Vault.ua,
           'X-Vault-Token': Vault.token
         }
       })
@@ -145,3 +166,5 @@ export default class Vault {
     return Buffer.from(res.data.plaintext, 'utf8').toString('base64')
   }
 }
+
+Vault.RESET()
