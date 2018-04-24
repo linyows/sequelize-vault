@@ -3,7 +3,10 @@ import Test from 'ava'
 import Vault from './vault'
 import Axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
 
-Test.beforeEach(() => { Vault.RESET() })
+Test.beforeEach(() => {
+  TD.reset()
+  Vault.RESET()
+})
 
 Test('#DEFAULT_UA includes name, version, url and node.js runtime version', (t) => {
   const re = /^sequelize-vault\/\d+\.\d+\.\d+ \(\+https:\/\/github.com\/linyows\/sequelize-vault; v\d+\.\d+\.\d+\)$/
@@ -14,14 +17,12 @@ Test('#ENCRYPT_IN_MEMORY returns encrypted text on memory', (t) => {
   TD.replace(process.stdout, 'write')
   const encrypted = Vault.ENCRYPT_IN_MEMORY('key', 'secret')
   t.is(encrypted, 'e6iA4LdnZEJYpeGafw8OyQ==')
-  TD.reset()
 })
 
 Test('#DECRYPT_IN_MEMORY returns encrypted text on memory', (t) => {
   TD.replace(process.stdout, 'write')
   const decrypted = Vault.DECRYPT_IN_MEMORY('key', 'e6iA4LdnZEJYpeGafw8OyQ==')
   t.is(decrypted, 'secret')
-  TD.reset()
 })
 
 Test('#BUILD_PATH returns path for Vault', (t) => {
