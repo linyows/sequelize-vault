@@ -39,7 +39,7 @@ export default class Vault {
 
   private pClient: AxiosInstance
 
-  public static async ENCRYPT_IN_MEMORY(key: string, plaintext: string): Promise<string> {
+  public static ENCRYPT_IN_MEMORY(key: string, plaintext: string): string {
     process.stdout.write(Vault.DEV_WARNING)
     const passowrd = Vault.MEMORY_FOR_KEY(key)
     const cipher = Crypto.createCipher(Vault.INMEMORY_ALGORITHM, passowrd)
@@ -49,7 +49,7 @@ export default class Vault {
     return cipheredText
   }
 
-  public static async DECRYPT_IN_MEMORY(key: string, ciphertext: string): Promise<string> {
+  public static DECRYPT_IN_MEMORY(key: string, ciphertext: string): string {
     process.stdout.write(Vault.DEV_WARNING)
     const passowrd = Vault.MEMORY_FOR_KEY(key)
     const decipher = Crypto.createDecipher(Vault.INMEMORY_ALGORITHM, passowrd)
