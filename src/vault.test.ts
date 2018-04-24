@@ -99,6 +99,7 @@ Test('.encrypt calls backend method', async (t) => {
   t.is(ciphertext, encrypted)
   TD.reset()
 
+  TD.replace(process.stdout, 'write')
   Vault.enabled = false
   v = new TestEncryptVault()
   ciphertext = await v.encrypt(key, pw)
@@ -122,6 +123,7 @@ Test('.decrypt calls backend method', async (t) => {
   t.is(plaintext, decrypted)
   TD.reset()
 
+  TD.replace(process.stdout, 'write')
   Vault.enabled = false
   v = new TestDecryptVault()
   plaintext = await v.decrypt(key, pw)
