@@ -1,9 +1,10 @@
 import Vault from './vault'
+export * from './vault'
 
 const fields: string[] = []
 let modelName: string = ''
 
-export function shield(model: any) {
+export default function SequelizeVault(model: any) {
   modelName = model
 
   for (const attribute of model.prototype.attributes) {

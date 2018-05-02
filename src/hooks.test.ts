@@ -1,6 +1,6 @@
 import * as TD from 'testdouble'
 import Test from 'ava'
-import * as Vault from './hooks'
+import SequelizeVault from './hooks'
 const Sequelize = require('sequelize')
 
 const sequelize =  new Sequelize({
@@ -35,7 +35,7 @@ const User = sequelize.define('user', {
 })
 
 sequelize['queryInterface'].createTable('users', schema)
-Vault.shield(User)
+SequelizeVault(User)
 TD.replace(process.stdout, 'write')
 
 Test('(integration) replace vault attributes "before save" to database', async (t) => {
