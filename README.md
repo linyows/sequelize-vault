@@ -27,7 +27,7 @@ This package transparently encrypts and decrypts columns in `_encrypted` format 
 
 ```js
 const Sequelize = require('sequelize')
-const Vault = require('sequelize-vault')
+const SequelizeVault = require('sequelize-vault')
 
 const s = new Sequelize({
   username: 'root',
@@ -39,7 +39,7 @@ const User = s.define('user', {
   ssn_encrypted: Sequelize.STRING,
   ssn: Sequelize.VIRTUAL,
 })
-Vault.shield(User)
+SequelizeVault.default(User)
 
 const u = await User.create({ ssn: '123-45-6789' })
 console.log(u.ssn_encrypted)
@@ -50,7 +50,7 @@ console.log(u.ssn_encrypted)
 
 ```ts
 import {Sequelize, Table, Column, Model} from 'sequelize-typescript'
-import * as Vault from 'sequelize-vault'
+import SequelizeVault from 'sequelize-vault'
 
 const s = new Sequelize({
   username: 'root',
@@ -70,7 +70,7 @@ class User extends Model<User> {
 
 s.addModels([User])
 
-Vault.shield(User)
+SequlizeVault(User)
 const u = await User.create({ ssn: '123-45-6789' })
 console.log(u.ssn_encrypted)
 // vault:v0:EE3EV8P5hyo9h...
