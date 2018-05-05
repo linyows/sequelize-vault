@@ -1,10 +1,9 @@
-import Vault from './vault'
-export * from './vault'
+import {Vault} from './vault'
 
 const fields: string[] = []
 let modelName: string = ''
 
-export default function SequelizeVault(model: any) {
+export function AddHooks(model: any) {
   modelName = model
 
   for (const attribute of model.prototype.attributes) {

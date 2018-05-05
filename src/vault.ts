@@ -21,7 +21,7 @@ export interface IConfig {
   ua?: string
 }
 
-export default class Vault {
+export class Vault {
   public static INMEMORY_ALGORITHM: string = 'aes-128-cbc'
   public static DEV_W_MSG: string = 'this is not secure and should never be used in production-like environments!'
   public static DEV_WARNING: string = `[sequelize-vault] Using in-memory cipher - ${Vault.DEV_W_MSG}\n`

@@ -1,6 +1,6 @@
 import * as TD from 'testdouble'
 import Test from 'ava'
-import Vault from './vault'
+import {Vault} from './vault'
 import Axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
 
 Test.beforeEach(() => {

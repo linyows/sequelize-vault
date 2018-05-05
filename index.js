@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = require('./lib/hooks');
+module.exports = require('./lib/sequelize-vault');
