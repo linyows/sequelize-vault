@@ -39,6 +39,9 @@ const User = s.define('user', {
   ssn_encrypted: Sequelize.STRING,
   ssn: Sequelize.VIRTUAL,
 })
+
+SequelizeVault.Vault.app = 'fooapp'
+SequelizeVault.Vault.address = 'http://master-vault'
 SequelizeVault.default(User)
 
 const u = await User.create({ ssn: '123-45-6789' })
@@ -50,7 +53,7 @@ console.log(u.ssn_encrypted)
 
 ```ts
 import {Sequelize, Table, Column, Model} from 'sequelize-typescript'
-import SequelizeVault from 'sequelize-vault'
+import SequelizeVault, {Vault} from 'sequelize-vault'
 
 const s = new Sequelize({
   username: 'root',
@@ -70,6 +73,8 @@ class User extends Model<User> {
 
 s.addModels([User])
 
+Vault.app = 'fooapp'
+Vault.address = 'http://master-vault'
 SequlizeVault(User)
 const u = await User.create({ ssn: '123-45-6789' })
 console.log(u.ssn_encrypted)
@@ -78,11 +83,6 @@ console.log(u.ssn_encrypted)
 
 Options
 -------
-
-```ts
-Vault.app = 'fooapp'
-Vault.address = 'http://master-vault'
-```
 
 Key     | Value
 ---     | ---
