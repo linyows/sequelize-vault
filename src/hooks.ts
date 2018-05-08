@@ -37,6 +37,10 @@ async function loadAttributesOnBeforeFind(query: any): Promise<void> {
 }
 
 async function loadAttributesOnAfterFind(ins: any, prop: Object, fn?: Function | undefined): Promise<void> {
+  if (ins === null) {
+    return
+  }
+
   if (prop['attributes'] !== undefined) {
     const vault = new Vault()
 
