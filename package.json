@@ -20,6 +20,8 @@
     "sequelize": "^4.37.6"
   },
   "devDependencies": {
+    "sequelize-typescript": "^0.6.4",
+    "reflect-metadata": "^0.1.12",
     "ava": "^0.22.0",
     "coveralls": "^3.0.0",
     "nsp": "^2.8.1",
