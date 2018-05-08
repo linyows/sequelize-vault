@@ -3,7 +3,7 @@ import {Vault} from './vault'
 const fields: string[] = []
 let modelName: string = ''
 
-export function AddHooks(model: any) {
+export function addHooks(model: any) {
   modelName = model
 
   for (const attribute of model.prototype.attributes) {
