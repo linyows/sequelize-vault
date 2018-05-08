@@ -1,10 +1,10 @@
 import {Vault} from './vault'
 
 const fields: string[] = []
-let modelName: string = ''
+let tableName: string = ''
 
 export function AddHooks(model: any) {
-  modelName = model
+  tableName = model.tableName
 
   for (const attribute of model.prototype.attributes) {
     const replaced = attribute.replace(Vault.suffix, '')
@@ -29,7 +29,7 @@ async function loadAttributesOnBeforeFind(query: any): Promise<void> {
 
   for (const f of fields) {
     if (query.where[f] !== undefined && typeof query.where[f] === 'string') {
-      const key = Vault.BUILD_PATH(modelName, f)
+      const key = Vault.BUILD_PATH(tableName, f)
       query.where[`${f}${Vault.suffix}`] = await vault.encrypt(key, query.where[f])
       delete query.where[f]
     }
@@ -49,7 +49,7 @@ async function loadAttributesOnAfterFind(ins: any, prop: Object, fn?: Function |
       if (!ciphertext || ciphertext === '') {
         continue
       }
-      const key = Vault.BUILD_PATH(ins.constructor.name, replaced)
+      const key = Vault.BUILD_PATH(ins.constructor.tableName, replaced)
       const plaintext = await vault.decrypt(key, ciphertext)
       ins.setDataValue(replaced, plaintext)
     }
@@ -71,7 +71,7 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
       if (!plaintext || plaintext === '') {
         continue
       }
-      const key = Vault.BUILD_PATH(ins.constructor.name, replaced)
+      const key = Vault.BUILD_PATH(ins.constructor.tableName, replaced)
       const ciphertext = await vault.encrypt(key, plaintext)
       ins.setDataValue(field, ciphertext)
     }
