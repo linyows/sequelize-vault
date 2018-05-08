@@ -98,3 +98,16 @@ const schemaTS = {
 sequelizeTS['queryInterface'].createTable('persons', schemaTS)
 sequelizeTS.addModels([Person])
 AddHooks(Person)
+
+Test('(sequelize-typescript) replace vault attributes "before save" to database', async (t) => {
+  const p = Person.build({name: 'foobar', email: 'foo@example.com'})
+  await p.save()
+  t.is(p.emailEncrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
+  t.is(p.email, 'foo@example.com')
+})
+
+Test('(sequelize-typescript) replace vault attributes "before create" to database', async (t) => {
+  const p = await Person.create({name: 'foobar', email: 'foo@example.com'})
+  t.is(p.emailEncrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
+  t.is(p.email, 'foo@example.com')
+})
