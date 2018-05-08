@@ -7,8 +7,9 @@ export function AddHooks(model: any) {
   tableName = model.tableName
 
   for (const attribute of model.prototype.attributes) {
-    const replaced = attribute.replace(Vault.suffix, '')
-    if (replaced === attribute) {
+    const field = model.rawAttributes === undefined ? attribute : model.rawAttributes[attribute]['field']
+    const replaced = field.replace(Vault.suffix, '')
+    if (replaced === field) {
       continue
     }
     fields.push(replaced)
@@ -45,11 +46,15 @@ async function loadAttributesOnAfterFind(ins: any, prop: Object, fn?: Function |
     const vault = new Vault()
 
     for (const field of prop['attributes']) {
-      const replaced = field.replace(Vault.suffix, '')
-      if (replaced === field) {
+      let strField = field
+      if (typeof field !== 'string') {
+        strField = field[1]
+      }
+      const replaced = strField.replace(Vault.suffix, '')
+      if (replaced === strField) {
         continue
       }
-      const ciphertext = ins.getDataValue(field)
+      const ciphertext = ins.getDataValue(strField)
       if (!ciphertext || ciphertext === '') {
         continue
       }
@@ -66,7 +71,8 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
   if (opts['fields'] !== undefined) {
     const vault = new Vault()
 
-    for (const field of opts['fields']) {
+    for (const f of opts['fields']) {
+      const field = ins.constructor.prototype.rawAttributes === undefined ? f : ins.constructor.prototype.rawAttributes[f]['field']
       const replaced = field.replace(Vault.suffix, '')
       if (replaced === field) {
         continue
@@ -77,7 +83,7 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
       }
       const key = Vault.BUILD_PATH(ins.constructor.tableName, replaced)
       const ciphertext = await vault.encrypt(key, plaintext)
-      ins.setDataValue(field, ciphertext)
+      ins.setDataValue(f, ciphertext)
     }
   }
 
