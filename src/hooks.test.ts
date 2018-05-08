@@ -1,6 +1,6 @@
 import * as TD from 'testdouble'
 import Test from 'ava'
-import {AddHooks} from './hooks'
+import {addHooks} from './hooks'
 import {Sequelize as SequelizeTS, Table, Column, Model, DataType} from 'sequelize-typescript'
 const Sequelize = require('sequelize')
 
@@ -36,7 +36,7 @@ const User = sequelize.define('user', {
 })
 
 sequelize['queryInterface'].createTable('users', schema)
-AddHooks(User)
+addHooks(User)
 TD.replace(process.stdout, 'write')
 
 Test('(integration) replace vault attributes "before save" to database', async (t) => {
@@ -97,7 +97,7 @@ const schemaTS = {
 
 sequelizeTS['queryInterface'].createTable('persons', schemaTS)
 sequelizeTS.addModels([Person])
-AddHooks(Person)
+addHooks(Person)
 
 Test('(sequelize-typescript) replace vault attributes "before save" to database', async (t) => {
   const p = Person.build({name: 'foobar', email: 'foo@example.com'})
