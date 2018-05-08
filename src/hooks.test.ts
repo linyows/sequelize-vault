@@ -1,6 +1,7 @@
 import * as TD from 'testdouble'
 import Test from 'ava'
 import {AddHooks} from './hooks'
+import {Sequelize as SequelizeTS, Table, Column, Model, DataType} from 'sequelize-typescript'
 const Sequelize = require('sequelize')
 
 const sequelize =  new Sequelize({
@@ -62,3 +63,38 @@ Test('(integration) set vault attributes "before find" to database', async (t) =
   const u = await User.findOne({where: { email: 'foo@example.com' }})
   t.is(u.email, 'foo@example.com')
 })
+
+const sequelizeTS = new SequelizeTS({
+  database: 'testts',
+  dialect: 'sqlite',
+  username: 'root',
+  password: '',
+  storage: ':memory:',
+  operatorsAliases: false,
+})
+
+@Table({ tableName: 'persons' })
+class Person extends Model<Person> {
+  @Column
+  public name: string
+
+  @Column(DataType.VIRTUAL)
+  public email: string
+
+  @Column({ field: 'email_encrypted' })
+  public emailEncrypted: string
+}
+
+const schemaTS = {
+  id: {
+    type: DataType.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: DataType.STRING,
+  email_encrypted: DataType.STRING,
+}
+
+sequelizeTS['queryInterface'].createTable('persons', schemaTS)
+sequelizeTS.addModels([Person])
+AddHooks(Person)
