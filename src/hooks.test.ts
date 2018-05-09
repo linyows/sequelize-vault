@@ -99,15 +99,33 @@ sequelizeTS['queryInterface'].createTable('persons', schemaTS)
 sequelizeTS.addModels([Person])
 addHooks(Person)
 
-Test('(sequelize-typescript) replace vault attributes "before save" to database', async (t) => {
+Test('when typescript, replace vault attributes "before save" to database', async (t) => {
   const p = Person.build({name: 'foobar', email: 'foo@example.com'})
   await p.save()
   t.is(p.emailEncrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
   t.is(p.email, 'foo@example.com')
 })
 
-Test('(sequelize-typescript) replace vault attributes "before create" to database', async (t) => {
+Test('when typescript, replace vault attributes "before create" to database', async (t) => {
   const p = await Person.create({name: 'foobar', email: 'foo@example.com'})
   t.is(p.emailEncrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
+  t.is(p.email, 'foo@example.com')
+})
+
+Test('when typescript, set vault attributes "after find" to database', async (t) => {
+  await Person.create({name: 'foobaz', email: 'foo@example.com'})
+  const p = await Person.findOne<Person>({where: { name: 'foobaz' }})
+  if (p === null) {
+    return
+  }
+  t.is(p.email, 'foo@example.com')
+})
+
+Test('when typescript, set vault attributes "before find" to database', async (t) => {
+  await Person.create({name: 'foobaz', email: 'foo@example.com'})
+  const p = await Person.findOne<Person>({where: { email: 'foo@example.com' }})
+  if (p === null) {
+    return
+  }
   t.is(p.email, 'foo@example.com')
 })
