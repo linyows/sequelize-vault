@@ -40,7 +40,9 @@ export class Vault {
   private pClient: AxiosInstance
 
   public static ENCRYPT_IN_MEMORY(key: string, plaintext: string): string {
-    process.stdout.write(Vault.DEV_WARNING)
+    if (Vault.DEV_WARNING != '') {
+      process.stdout.write(Vault.DEV_WARNING)
+    }
     const passowrd = Vault.MEMORY_FOR_KEY(key)
     const cipher = Crypto.createCipher(Vault.INMEMORY_ALGORITHM, passowrd)
     let cipheredText = cipher.update(plaintext, 'utf8', 'base64')
@@ -50,7 +52,9 @@ export class Vault {
   }
 
   public static DECRYPT_IN_MEMORY(key: string, ciphertext: string): string {
-    process.stdout.write(Vault.DEV_WARNING)
+    if (Vault.DEV_WARNING != '') {
+      process.stdout.write(Vault.DEV_WARNING)
+    }
     const passowrd = Vault.MEMORY_FOR_KEY(key)
     const decipher = Crypto.createDecipher(Vault.INMEMORY_ALGORITHM, passowrd)
     let decipheredText = decipher.update(ciphertext, 'base64', 'utf8')

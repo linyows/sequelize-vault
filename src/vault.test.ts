@@ -5,6 +5,7 @@ import Axios, {AxiosRequestConfig, AxiosResponse} from 'axios'
 
 Test.beforeEach(() => {
   TD.reset()
+  Vault.DEV_WARNING = ''
   Vault.RESET()
 })
 
@@ -14,13 +15,11 @@ Test('#DEFAULT_UA includes name, version, url and node.js runtime version', (t) 
 })
 
 Test('#ENCRYPT_IN_MEMORY returns encrypted text on memory', (t) => {
-  TD.replace(process.stdout, 'write')
   const encrypted = Vault.ENCRYPT_IN_MEMORY('key', 'secret')
   t.is(encrypted, 'e6iA4LdnZEJYpeGafw8OyQ==')
 })
 
 Test('#DECRYPT_IN_MEMORY returns encrypted text on memory', (t) => {
-  TD.replace(process.stdout, 'write')
   const decrypted = Vault.DECRYPT_IN_MEMORY('key', 'e6iA4LdnZEJYpeGafw8OyQ==')
   t.is(decrypted, 'secret')
 })
@@ -99,7 +98,6 @@ Test('.encrypt calls backend method', async (t) => {
   t.is(ciphertext, encrypted)
   TD.reset()
 
-  TD.replace(process.stdout, 'write')
   Vault.enabled = false
   v = new TestEncryptVault()
   ciphertext = await v.encrypt(key, pw)
@@ -123,7 +121,6 @@ Test('.decrypt calls backend method', async (t) => {
   t.is(plaintext, decrypted)
   TD.reset()
 
-  TD.replace(process.stdout, 'write')
   Vault.enabled = false
   v = new TestDecryptVault()
   plaintext = await v.decrypt(key, pw)
