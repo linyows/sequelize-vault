@@ -37,31 +37,29 @@ async function loadAttributesOnBeforeFind(query: any): Promise<void> {
   }
 }
 
-async function loadAttributesOnAfterFind(ins: any, prop: Object, fn?: Function | undefined): Promise<void> {
+async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | undefined): Promise<void> {
   if (ins === null) {
     return
   }
 
-  if (prop['attributes'] !== undefined) {
-    const vault = new Vault()
+  const vault = new Vault()
+  const arrayAttrs = ins.constructor.prototype.attributes
+  const rawAttrs = ins.constructor.prototype.rawAttributes
+  const table = ins.constructor.tableName
 
-    for (const field of prop['attributes']) {
-      let strField = field
-      if (typeof field !== 'string') {
-        strField = field[1]
-      }
-      const replaced = strField.replace(Vault.suffix, '')
-      if (replaced === strField) {
-        continue
-      }
-      const ciphertext = ins.getDataValue(strField)
-      if (!ciphertext || ciphertext === '') {
-        continue
-      }
-      const key = Vault.BUILD_PATH(ins.constructor.tableName, replaced)
-      const plaintext = await vault.decrypt(key, ciphertext)
-      ins.setDataValue(replaced, plaintext)
+  for (const attr of arrayAttrs) {
+    const field = rawAttrs === undefined ? attr : rawAttrs[attr]['field']
+    const replaced = field.replace(Vault.suffix, '')
+    if (replaced === field) {
+      continue
     }
+    const ciphertext = ins.getDataValue(attr)
+    if (!ciphertext || ciphertext === '') {
+      continue
+    }
+    const key = Vault.BUILD_PATH(table, replaced)
+    const plaintext = await vault.decrypt(key, ciphertext)
+    ins.setDataValue(replaced, plaintext)
   }
 
   return fn !== undefined ? fn(null, ins) : ins
