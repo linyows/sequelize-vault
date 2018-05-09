@@ -5,9 +5,11 @@ let tableName: string = ''
 
 export function addHooks(model: any) {
   tableName = model.tableName
+  const arrayAttrs = model.prototype.attributes
+  const rawAttrs = model.rawAttributes
 
-  for (const attribute of model.prototype.attributes) {
-    const field = model.rawAttributes === undefined ? attribute : model.rawAttributes[attribute]['field']
+  for (const attr of arrayAttrs) {
+    const field = rawAttrs === undefined ? attr : rawAttrs[attr]['field']
     const replaced = field.replace(Vault.suffix, '')
     if (replaced === field) {
       continue
@@ -68,9 +70,11 @@ async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | un
 async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Function | undefined): Promise<void> {
   if (opts['fields'] !== undefined) {
     const vault = new Vault()
+    const rawAttrs = ins.constructor.prototype.rawAttributes
+    const table = ins.constructor.tableName
 
     for (const f of opts['fields']) {
-      const field = ins.constructor.prototype.rawAttributes === undefined ? f : ins.constructor.prototype.rawAttributes[f]['field']
+      const field = rawAttrs === undefined ? f : rawAttrs[f]['field']
       const replaced = field.replace(Vault.suffix, '')
       if (replaced === field) {
         continue
@@ -79,7 +83,7 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
       if (!plaintext || plaintext === '') {
         continue
       }
-      const key = Vault.BUILD_PATH(ins.constructor.tableName, replaced)
+      const key = Vault.BUILD_PATH(table, replaced)
       const ciphertext = await vault.encrypt(key, plaintext)
       ins.setDataValue(f, ciphertext)
     }
