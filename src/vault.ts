@@ -40,7 +40,7 @@ export class Vault {
   private pClient: AxiosInstance
 
   public static ENCRYPT_IN_MEMORY(key: string, plaintext: string): string {
-    if (Vault.DEV_WARNING != '') {
+    if (Vault.DEV_WARNING !== '') {
       process.stdout.write(Vault.DEV_WARNING)
     }
     const passowrd = Vault.MEMORY_FOR_KEY(key)
@@ -52,7 +52,7 @@ export class Vault {
   }
 
   public static DECRYPT_IN_MEMORY(key: string, ciphertext: string): string {
-    if (Vault.DEV_WARNING != '') {
+    if (Vault.DEV_WARNING !== '') {
       process.stdout.write(Vault.DEV_WARNING)
     }
     const passowrd = Vault.MEMORY_FOR_KEY(key)
