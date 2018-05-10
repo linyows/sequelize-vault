@@ -129,3 +129,46 @@ Test('when typescript, set vault attributes "before find" to database', async (t
   }
   t.is(p.email, 'foo@example.com')
 })
+
+Test('when typescript and postgres, replace vault attributes "before save" to database', async (t) => {
+  @Table({ tableName: 'admins' })
+  class Admin extends Model<Admin> {
+    @Column
+    public name: string
+
+    @Column(DataType.VIRTUAL)
+    public email: string
+
+    @Column({ field: 'email_encrypted' })
+    public emailEncrypted: string
+  }
+
+  const sequelize = new SequelizeTS({
+    name: 'sequelizevault',
+    dialect: 'postgres',
+    username: 'sequelizevault',
+    password: '',
+    operatorsAliases: false,
+  })
+
+  const schema = {
+    id: {
+      type: DataType.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+    name: DataType.STRING,
+    // If the column of virtual type exists, its value is returned as null.
+    email: DataType.STRING,
+    email_encrypted: DataType.STRING,
+  }
+
+  await sequelize['queryInterface'].createTable('admins', schema)
+  sequelize.addModels([Admin])
+  addHooks(Admin)
+
+  const a = Admin.build({name: 'foobar', email: 'foo@example.com'})
+  await a.save()
+  t.is(a.emailEncrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
+  t.is(a.email, 'foo@example.com')
+})
