@@ -3,6 +3,8 @@ node_js:
   - "8"
 script:
   - npm run ci
+services:
+  - postgresql
 after_success:
   - './node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls'
 notifications:
