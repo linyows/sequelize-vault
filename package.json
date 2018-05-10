@@ -52,7 +52,9 @@
     "lint": "tslint -p tsconfig.json -c tslint.json src/**/*.ts",
     "preversion": "npm run clean && npm run build && npm test",
     "postversion": "git push origin --tags",
-    "prepublishOnly": "npm run clean && npm run build && npm test"
+    "prepublishOnly": "npm run clean && npm run build && npm test",
+    "db:create": "createuser sequelizevault && createdb sequelizevault",
+    "db:drop": "dropdb sequelizevault && dropuser sequelizevault"
   },
   "repository": {
     "type": "git",
