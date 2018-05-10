@@ -64,6 +64,13 @@ Test('when native, set vault attributes "before find" to database', async (t) =>
   t.is(u.email, 'foo@example.com')
 })
 
+Test('when native, no set vault attributes "before find" to database', async (t) => {
+  const uu = await User.create({name: 'foo'})
+  const u = await User.findOne({where: { id: uu.id }})
+  t.is(uu.email, undefined)
+  t.is(u.email, undefined)
+})
+
 const sequelizeTS = new SequelizeTS({
   database: 'testts',
   dialect: 'sqlite',
@@ -128,6 +135,16 @@ Test('when typescript, set vault attributes "before find" to database', async (t
     return
   }
   t.is(p.email, 'foo@example.com')
+})
+
+Test('when typescript, no set vault attributes "before find" to database', async (t) => {
+  const pp = await Person.create({name: 'foo'})
+  const p = await Person.findOne<Person>({where: { id: pp.id }})
+  if (p === null) {
+    return
+  }
+  t.is(pp.email, undefined)
+  t.is(p.email, undefined)
 })
 
 Test('when typescript and postgres, replace vault attributes "before save" to database', async (t) => {
