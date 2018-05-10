@@ -27,6 +27,7 @@
     "coveralls": "^3.0.1",
     "nsp": "^3.2.1",
     "nyc": "^11.7.3",
+    "pg": "^7.4.3",
     "reflect-metadata": "^0.1.12",
     "sequelize-typescript": "^0.6.4",
     "sqlite3": "^4.0.0",
@@ -56,12 +57,14 @@
     "build": "tsc",
     "clean": "rm -rf lib",
     "ci": "npm install && npm run lint && npm run cov && nsp check",
-    "test": "ava-ts -v",
-    "cov": "nyc ava-ts",
+    "test": "npm run db:create && ava-ts -v && npm run db:drop",
+    "cov": "nyc npm test",
     "lint": "tslint -p tsconfig.json -c tslint.json src/**/*.ts",
     "preversion": "npm run clean && npm run build && npm test",
     "postversion": "git push origin --tags",
-    "prepublishOnly": "npm run clean && npm run build && npm test"
+    "prepublishOnly": "npm run clean && npm run build && npm test",
+    "db:create": "createuser sequelizevault && createdb sequelizevault",
+    "db:drop": "dropdb sequelizevault && dropuser sequelizevault"
   },
   "repository": {
     "type": "git",
