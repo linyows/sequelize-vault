@@ -103,7 +103,7 @@ async function persistAttributesOnAfterSave(ins: any, opts: Object, fn?: Functio
     for (const f of opts['fields']) {
       const field = rawAttrs === undefined ? f : rawAttrs[f]['field']
       const replaced = field.replace(Vault.suffix, '')
-      if (replaced === field) {
+      if (replaced === field || ins.getDataValue(replaced) !== null) {
         continue
       }
       const ciphertext = ins.getDataValue(f)
