@@ -1,6 +1,6 @@
 <p align="center"><a href="http://docs.sequelizejs.com/"><img src="https://polidog.jp/images/sequelize.png" height="80" align="middle"></a> <a href="https://www.vaultproject.io/"><img src="https://s3.amazonaws.com/hashicorp-marketing-web-assets/brand/Vault_PrimaryLogo_FullColor.HkwAATB6e.svg" height="65" align="middle"></a></p>
 
-<p align="center"><strong>Sequelize Vault</strong>: A <a href="http://docs.sequelizejs.com/">Sequelize</a> plugin for easily integrating <a href="https://www.vaultproject.io/">Hashicorp Vault</a>.</p> <br> <br>
+<p align="center"><strong>Sequelize Vault</strong>: A Sequelize plugin for easily integrating Hashicorp Vault.</p> <br> <br>
 
 <a href="https://www.npmjs.com/package/sequelize-vault" title="npm"><img src="http://img.shields.io/npm/v/sequelize-vault.svg?style=flat-square"></a>
 <a href="https://travis-ci.org/linyows/sequelize-vault" title="travis"><img src="https://img.shields.io/travis/linyows/sequelize-vault.svg?style=flat-square"></a>
