@@ -57,7 +57,7 @@
     "build": "tsc",
     "clean": "rm -rf lib",
     "ci": "npm install && npm run lint && npm run cov && nsp check",
-    "test": "npm run db:create && ava-ts -v && npm run db:drop",
+    "test": "npm run db:create && ava-ts -v ; npm run db:drop",
     "cov": "nyc npm test",
     "lint": "tslint -p tsconfig.json -c tslint.json src/**/*.ts",
     "preversion": "npm run clean && npm run build && npm test",
