@@ -1,15 +1,10 @@
-Sequelize Vault
-===============
-
-A [Sequelize][sequelize] plugin for easily integrating [Hashicorp Vault][vault].
+<p align="center"><a href="http://docs.sequelizejs.com/"><img src="https://polidog.jp/images/sequelize.png" height="80" align="middle"></a> <strong> + </strong> <a href="https://www.vaultproject.io/"><img src="https://s3.amazonaws.com/hashicorp-marketing-web-assets/brand/Vault_PrimaryLogo_FullColor.HkwAATB6e.svg" height="65" align="middle"></a></p>
+<p align="center"><strong>Sequelize Vault</strong><br>A <strong>Sequelize</strong> plugin for easily integrating <strong>Hashicorp Vault</strong>.</p> <br> <br>
 
 <a href="https://www.npmjs.com/package/sequelize-vault" title="npm"><img src="http://img.shields.io/npm/v/sequelize-vault.svg?style=flat-square"></a>
 <a href="https://travis-ci.org/linyows/sequelize-vault" title="travis"><img src="https://img.shields.io/travis/linyows/sequelize-vault.svg?style=flat-square"></a>
 <a href="https://coveralls.io/github/linyows/sequelize-vault" title="coveralls"><img src="https://img.shields.io/coveralls/linyows/sequelize-vault.svg?style=flat-square"></a>
 <a href="https://github.com/linyows/sequelize-vault/blob/master/LICENSE" title="MIT License"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square"></a>
-
-[sequelize]: http://docs.sequelizejs.com/
-[vault]: https://www.vaultproject.io/
 
 Installation
 ------------
