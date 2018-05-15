@@ -10,6 +10,8 @@
 Installation
 ------------
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/linyows/sequelize-vault.svg)](https://greenkeeper.io/)
+
 ```sh
 $ npm install sequelize-vault
 ```
