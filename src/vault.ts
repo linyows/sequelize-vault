@@ -170,7 +170,7 @@ export class Vault {
       ciphertext: ciphertext
     })
 
-    return Buffer.from(res.data.data.plaintext, 'utf8').toString('base64')
+    return Buffer.from(res.data.data.plaintext, 'base64').toString('utf8')
   }
 }
 
