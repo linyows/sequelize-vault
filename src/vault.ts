@@ -157,7 +157,7 @@ export class Vault {
       plaintext: Buffer.from(plaintext, 'utf8').toString('base64')
     })
 
-    return res.data.ciphertext
+    return res.data.data.ciphertext
   }
 
   public async decryptByVault(key: string, ciphertext: string): Promise<string> {
@@ -170,7 +170,7 @@ export class Vault {
       ciphertext: ciphertext
     })
 
-    return Buffer.from(res.data.plaintext, 'utf8').toString('base64')
+    return Buffer.from(res.data.data.plaintext, 'utf8').toString('base64')
   }
 }
 
