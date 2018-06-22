@@ -87,7 +87,7 @@ export class Vault {
       token: 'abcd1234',
       address: 'https://vault.example.com',
       suffix: '_encrypted',
-      path: 'transit',
+      path: 'v1/transit',
       timeout: sec * msec,
       ua: Vault.DEFAULT_UA
     }
