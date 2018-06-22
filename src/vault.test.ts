@@ -16,11 +16,11 @@ Test('#DEFAULT_UA includes name, version, url and node.js runtime version', (t) 
 
 Test('#ENCRYPT_IN_MEMORY returns encrypted text on memory', (t) => {
   const encrypted = Vault.ENCRYPT_IN_MEMORY('key', 'secret')
-  t.is(encrypted, 'e6iA4LdnZEJYpeGafw8OyQ==')
+  t.is(encrypted, 'VDJylrbtGklNEqyBJS+yIA==')
 })
 
 Test('#DECRYPT_IN_MEMORY returns encrypted text on memory', (t) => {
-  const decrypted = Vault.DECRYPT_IN_MEMORY('key', 'e6iA4LdnZEJYpeGafw8OyQ==')
+  const decrypted = Vault.DECRYPT_IN_MEMORY('key', 'VDJylrbtGklNEqyBJS+yIA==')
   t.is(decrypted, 'secret')
 })
 
@@ -31,7 +31,7 @@ Test('#BUILD_PATH returns path for Vault', (t) => {
 
 Test('#MEMORY_FOR_KEY returns base64 key', (t) => {
   const m = Vault.MEMORY_FOR_KEY('bar')
-  t.is(m, 'dHJhbnNpdC9iYXI=')
+  t.is(m, 'djEvdHJhbnNpdC9i')
 })
 
 Test('#config returns default config', (t) => {
@@ -41,7 +41,7 @@ Test('#config returns default config', (t) => {
     address: 'https://vault.example.com',
     app: 'my-app',
     enabled: false,
-    path: 'transit',
+    path: 'v1/transit',
     suffix: '_encrypted',
     token: 'abcd1234',
     timeout: 180000,
@@ -56,7 +56,7 @@ Test('#config sets attributes as config', (t) => {
     address: 'http://vault',
     app: 'foo',
     enabled: false,
-    path: 'transit',
+    path: 'v1/transit',
     suffix: '_encrypted',
     token: 'secret',
     timeout: 180000,
@@ -102,12 +102,12 @@ Test('.encrypt calls backend method', async (t) => {
   v = new TestEncryptVault()
   ciphertext = await v.encrypt(key, pw)
 
-  t.is(ciphertext, 'GKQR6G1CtWynueC7MjyI1A==')
+  t.is(ciphertext, 'hFwH3D+r4Qm8VrxClfJgGA==')
 })
 
 Test('.decrypt calls backend method', async (t) => {
   const key = 'foo/bar'
-  const pw = 'GKQR6G1CtWynueC7MjyI1A=='
+  const pw = 'hFwH3D+r4Qm8VrxClfJgGA=='
   const decrypted = 'bXkgc2VjcmV0IGRhdGEK'
   let v: Vault
   let plaintext: string
@@ -134,7 +134,7 @@ Test('.encryptByVault returns encrypted text', async (t) => {
   v.client = Axios.create({
     adapter: async (config: AxiosRequestConfig) => {
       const response: AxiosResponse = {
-        data: `{"ciphertext":"${encrypted}"}`,
+        data: `{"data":{"ciphertext":"${encrypted}"}}`,
         status: 200,
         statusText: 'OK',
         headers: {},
@@ -148,12 +148,12 @@ Test('.encryptByVault returns encrypted text', async (t) => {
 })
 
 Test('.decryptByVault returns decrypted text', async (t) => {
-  const decrypted = 'bXkgc2VjcmV0IGRhdGEK'
+  const decrypted = 'bXkgc2VjcmV0IGRhdGE='
   const v = new Vault()
   v.client = Axios.create({
     adapter: async (config: AxiosRequestConfig) => {
       const response: AxiosResponse = {
-        data: `{"plaintext":"${decrypted}"}`,
+        data: `{"data":{"plaintext":"${decrypted}"}}`,
         status: 200,
         statusText: 'OK',
         headers: {},
@@ -163,5 +163,5 @@ Test('.decryptByVault returns decrypted text', async (t) => {
     }
   })
   const plaintext = await v.decryptByVault('foo/bar', 'vault:v1:8SDd3WHDOjf7mq69CyCqYjBXAiQQAVZRkFM13ok481zoCmHnSeDX9vyf7w==')
-  t.is(plaintext, 'YlhrZ2MyVmpjbVYwSUdSaGRHRUs=')
+  t.is(plaintext, 'my secret data')
 })

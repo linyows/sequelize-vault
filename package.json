@@ -1,6 +1,6 @@
 {
   "name": "sequelize-vault",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "A Sequelize plugin for easily integrating Hashicorp Vault",
   "main": "index.js",
   "types": "lib/sequelize-vault.d.ts",
@@ -56,7 +56,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf lib",
-    "ci": "npm install && npm run lint && npm run cov && nsp check",
+    "ci": "npm install && npm run lint && npm run db:create && nyc ava-ts -v && nsp check",
     "test": "npm run db:create && ava-ts -v ; npm run db:drop",
     "cov": "nyc npm test",
     "lint": "tslint -p tsconfig.json -c tslint.json src/**/*.ts",

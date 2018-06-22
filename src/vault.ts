@@ -87,7 +87,7 @@ export class Vault {
       token: 'abcd1234',
       address: 'https://vault.example.com',
       suffix: '_encrypted',
-      path: 'transit',
+      path: 'v1/transit',
       timeout: sec * msec,
       ua: Vault.DEFAULT_UA
     }
@@ -157,7 +157,7 @@ export class Vault {
       plaintext: Buffer.from(plaintext, 'utf8').toString('base64')
     })
 
-    return res.data.ciphertext
+    return res.data.data.ciphertext
   }
 
   public async decryptByVault(key: string, ciphertext: string): Promise<string> {
@@ -170,7 +170,7 @@ export class Vault {
       ciphertext: ciphertext
     })
 
-    return Buffer.from(res.data.plaintext, 'utf8').toString('base64')
+    return Buffer.from(res.data.data.plaintext, 'base64').toString('utf8')
   }
 }
 
