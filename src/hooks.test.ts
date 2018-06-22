@@ -42,13 +42,13 @@ TD.replace(process.stdout, 'write')
 Test('when native, replace vault attributes "before save" to database', async (t) => {
   const u = User.build({name: 'foobar', email: 'foo@example.com'})
   await u.save()
-  t.is(u.email_encrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
+  t.is(u.email_encrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
   t.is(u.email, 'foo@example.com')
 })
 
 Test('when native, replace vault attributes "before create" to database', async (t) => {
   const u = await User.create({name: 'foobar', email: 'foo@example.com'})
-  t.is(u.email_encrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
+  t.is(u.email_encrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
   t.is(u.email, 'foo@example.com')
 })
 
@@ -109,13 +109,13 @@ addHooks(Person)
 Test('when typescript, replace vault attributes "before save" to database', async (t) => {
   const p = Person.build({name: 'foobar', email: 'foo@example.com'})
   await p.save()
-  t.is(p.emailEncrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
+  t.is(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
   t.is(p.email, 'foo@example.com')
 })
 
 Test('when typescript, replace vault attributes "before create" to database', async (t) => {
   const p = await Person.create({name: 'foobar', email: 'foo@example.com'})
-  t.is(p.emailEncrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
+  t.is(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
   t.is(p.email, 'foo@example.com')
 })
 
@@ -186,6 +186,6 @@ Test('when typescript and postgres, replace vault attributes "before save" to da
 
   const a = Admin.build({name: 'foobar', email: 'foo@example.com'})
   await a.save()
-  t.is(a.emailEncrypted, 'A2BPy5oy0zYg1iG5wuGqzg==')
+  t.is(a.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
   t.is(a.email, 'foo@example.com')
 })
