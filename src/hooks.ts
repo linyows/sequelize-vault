@@ -48,6 +48,11 @@ async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | un
 
   const vault = new Vault()
   const arrayAttrs = ins.constructor.prototype.attributes
+
+  if (!Array.isArray(arrayAttrs)) {
+    return fn !== undefined ? fn(null, ins) : ins
+  }
+
   const rawAttrs = ins.constructor.prototype.rawAttributes
   const table = ins.constructor.tableName
 
