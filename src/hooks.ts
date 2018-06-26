@@ -80,19 +80,24 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
     const rawAttrs = ins.constructor.prototype.rawAttributes
     const table = ins.constructor.tableName
 
+    let fields: object = {}
+    for (const key of Object.keys(rawAttrs)) {
+      fields[rawAttrs[key]['field']] = rawAttrs[key]['fieldName']
+    }
+
     for (const f of opts['fields']) {
       const field = rawAttrs === undefined ? f : rawAttrs[f]['field']
-      const replaced = field.replace(Vault.suffix, '')
-      if (replaced === field) {
+      const encryptedFieldName = field+Vault.suffix
+      if (fields[encryptedFieldName] === undefined) {
         continue
       }
-      const plaintext = ins.getDataValue(replaced)
+      const plaintext = ins.getDataValue(field)
       if (!plaintext || plaintext === '') {
         continue
       }
-      const key = Vault.BUILD_PATH(table, replaced)
+      const key = Vault.BUILD_PATH(table, field)
       const ciphertext = await vault.encrypt(key, plaintext)
-      ins.setDataValue(f, ciphertext)
+      ins.setDataValue(fields[encryptedFieldName], ciphertext)
     }
   }
 
