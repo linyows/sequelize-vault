@@ -52,6 +52,14 @@ Test('when native, replace vault attributes "before create" to database', async 
   t.is(u.email, 'foo@example.com')
 })
 
+Test('when native, replace vault attributes "before update" to database', async (t) => {
+  const u = await User.create({name: 'foobar', email: 'foo@example.com'})
+  u.email = 'foo-to-zoo@example.com'
+  await u.save()
+  t.not(u.email_encrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
+  t.is(u.email, 'foo-to-zoo@example.com')
+})
+
 Test('when native, set vault attributes "after find" to database', async (t) => {
   await User.create({name: 'foobaz', email: 'foo@example.com'})
   const u = await User.findOne({where: { name: 'foobaz' }})
