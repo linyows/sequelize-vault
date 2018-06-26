@@ -78,7 +78,7 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
 
     for (const f of opts['fields']) {
       const field = rawAttrs === undefined ? f : rawAttrs[f]['field']
-      const encryptedFieldName = field+Vault.suffix
+      const encryptedFieldName = `${field}${Vault.suffix}`
       if (fields[table][encryptedFieldName] === undefined) {
         continue
       }
