@@ -84,7 +84,8 @@ Options
 
 Key     | Value
 ---     | ---
-enabled | true or false
+enabled | true or false(default)
+derived | true or false(default)
 app     | my-app
 token   | abcd1234
 address | https://vault.example.com

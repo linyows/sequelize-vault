@@ -1,23 +1,16 @@
 import {Vault} from './vault'
 
-const fields: string[] = []
-let tableName: string = ''
+const fields: object = {}
 
 export function addHooks(model: any) {
-  tableName = model.tableName
-  const arrayAttrs = model.prototype.attributes
+  const table = model.tableName
+  fields[table] = {}
   const rawAttrs = model.rawAttributes
 
-  for (const attr of arrayAttrs) {
-    const field = rawAttrs === undefined ? attr : rawAttrs[attr]['field']
-    const replaced = field.replace(Vault.suffix, '')
-    if (replaced === field) {
-      continue
-    }
-    fields.push(replaced)
+  for (const key of Object.keys(rawAttrs)) {
+    fields[table][rawAttrs[key]['field']] = rawAttrs[key]['fieldName']
   }
 
-  model.beforeFind('loadAttributesOnBeforeFind', loadAttributesOnBeforeFind)
   model.afterFind('loadAttributesOnAfterFind', loadAttributesOnAfterFind)
   model.beforeCreate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
   model.beforeUpdate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
@@ -25,20 +18,20 @@ export function addHooks(model: any) {
   model.afterUpdate('persistAttributesOnAfterSave', persistAttributesOnAfterSave)
 }
 
-async function loadAttributesOnBeforeFind(query: any): Promise<void> {
-  if (query.where === undefined) {
-    return
-  }
+// This requires "convergent_encryption" and "derived" to be set to true for vault.
+// See https://www.vaultproject.io/api/secret/transit/index.html#convergent_encryption
+export async function findOneByEncrypted<T>(model: any, cond: object): Promise<T> {
+  const table = model.tableName
+  const keys = Object.keys(cond)
+  const field = keys[0]
+  const value = cond[field]
 
   const vault = new Vault()
+  const encrypted = await vault.encrypt(Vault.BUILD_PATH(table, field), value)
+  const where: object = {}
+  where[`${field}${Vault.suffix}`] = encrypted
 
-  for (const f of fields) {
-    if (query.where[f] !== undefined && typeof query.where[f] === 'string') {
-      const key = Vault.BUILD_PATH(tableName, f)
-      query.where[`${f}${Vault.suffix}`] = await vault.encrypt(key, query.where[f])
-      delete query.where[f]
-    }
-  }
+  return model.findOne({ where })
 }
 
 async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | undefined): Promise<void> {
@@ -82,17 +75,17 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
 
     for (const f of opts['fields']) {
       const field = rawAttrs === undefined ? f : rawAttrs[f]['field']
-      const replaced = field.replace(Vault.suffix, '')
-      if (replaced === field) {
+      const encryptedFieldName = `${field}${Vault.suffix}`
+      if (fields[table][encryptedFieldName] === undefined) {
         continue
       }
-      const plaintext = ins.getDataValue(replaced)
+      const plaintext = ins.getDataValue(field)
       if (!plaintext || plaintext === '') {
         continue
       }
-      const key = Vault.BUILD_PATH(table, replaced)
+      const key = Vault.BUILD_PATH(table, field)
       const ciphertext = await vault.encrypt(key, plaintext)
-      ins.setDataValue(f, ciphertext)
+      ins.setDataValue(fields[table][encryptedFieldName], ciphertext)
     }
   }
 

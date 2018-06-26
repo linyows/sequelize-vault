@@ -1,6 +1,6 @@
 import * as TD from 'testdouble'
 import Test from 'ava'
-import {addHooks} from './hooks'
+import {addHooks, findOneByEncrypted} from './hooks'
 import {Sequelize as SequelizeTS, Table, Column, Model, DataType} from 'sequelize-typescript'
 const Sequelize = require('sequelize')
 
@@ -37,6 +37,8 @@ const User = sequelize.define('user', {
 
 sequelize['queryInterface'].createTable('users', schema)
 addHooks(User)
+
+// Hide stdout!!!!!!!!!!!!!!!!
 TD.replace(process.stdout, 'write')
 
 Test('when native, replace vault attributes "before save" to database', async (t) => {
@@ -52,23 +54,24 @@ Test('when native, replace vault attributes "before create" to database', async 
   t.is(u.email, 'foo@example.com')
 })
 
+Test('when native, replace vault attributes "before update" to database', async (t) => {
+  const u = await User.create({name: 'foobar', email: 'foo@example.com'})
+  u.email = 'foo-to-zoo@example.com'
+  await u.save()
+  t.not(u.email_encrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
+  t.is(u.email, 'foo-to-zoo@example.com')
+})
+
 Test('when native, set vault attributes "after find" to database', async (t) => {
   await User.create({name: 'foobaz', email: 'foo@example.com'})
   const u = await User.findOne({where: { name: 'foobaz' }})
   t.is(u.email, 'foo@example.com')
 })
 
-Test('when native, set vault attributes "before find" to database', async (t) => {
+Test('when native, use findOneByEncrypted', async (t) => {
   await User.create({name: 'foobaz', email: 'foo@example.com'})
-  const u = await User.findOne({where: { email: 'foo@example.com' }})
+  const u = await findOneByEncrypted(User, { email: 'foo@example.com' }) as any
   t.is(u.email, 'foo@example.com')
-})
-
-Test('when native, no set vault attributes "before find" to database', async (t) => {
-  const uu = await User.create({name: 'foo'})
-  const u = await User.findOne({where: { id: uu.id }})
-  t.is(uu.email, undefined)
-  t.is(u.email, undefined)
 })
 
 Test('when native, skip decrypt on "find all"', async (t) => {
@@ -126,6 +129,14 @@ Test('when typescript, replace vault attributes "before create" to database', as
   t.is(p.email, 'foo@example.com')
 })
 
+Test('when typescript, replace vault attributes "before update" to database', async (t) => {
+  const p = await Person.create({name: 'foobar', email: 'foo@example.com'})
+  p.email = 'foo-to-zoo@example.com'
+  await p.save()
+  t.not(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
+  t.is(p.email, 'foo-to-zoo@example.com')
+})
+
 Test('when typescript, set vault attributes "after find" to database', async (t) => {
   await Person.create({name: 'foobaz', email: 'foo@example.com'})
   const p = await Person.findOne<Person>({where: { name: 'foobaz' }})
@@ -135,23 +146,13 @@ Test('when typescript, set vault attributes "after find" to database', async (t)
   t.is(p.email, 'foo@example.com')
 })
 
-Test('when typescript, set vault attributes "before find" to database', async (t) => {
+Test('when typescript, use findOneByEncrypted', async (t) => {
   await Person.create({name: 'foobaz', email: 'foo@example.com'})
-  const p = await Person.findOne<Person>({where: { email: 'foo@example.com' }})
+  const p = await findOneByEncrypted<Person>(Person, { email: 'foo@example.com' })
   if (p === null) {
     return
   }
   t.is(p.email, 'foo@example.com')
-})
-
-Test('when typescript, no set vault attributes "before find" to database', async (t) => {
-  const pp = await Person.create({name: 'foo'})
-  const p = await Person.findOne<Person>({where: { id: pp.id }})
-  if (p === null) {
-    return
-  }
-  t.is(pp.email, undefined)
-  t.is(p.email, undefined)
 })
 
 Test('when typescript, skip decrypt on "find all"', async (t) => {

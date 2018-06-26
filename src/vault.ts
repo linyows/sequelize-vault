@@ -19,6 +19,7 @@ export interface IConfig {
   path?: string
   timeout?: number
   ua?: string
+  derived?: boolean
 }
 
 export class Vault {
@@ -36,6 +37,7 @@ export class Vault {
   public static path: string
   public static timeout: number
   public static ua: string
+  public static derived: boolean
 
   private pClient: AxiosInstance
 
@@ -89,7 +91,8 @@ export class Vault {
       suffix: '_encrypted',
       path: 'v1/transit',
       timeout: sec * msec,
-      ua: Vault.DEFAULT_UA
+      ua: Vault.DEFAULT_UA,
+      derived: false
     }
   }
 
@@ -102,7 +105,8 @@ export class Vault {
       suffix: Vault.suffix,
       path: Vault.path,
       timeout: Vault.timeout,
-      ua: Vault.ua
+      ua: Vault.ua,
+      derived: Vault.derived
     }
   }
 
@@ -131,44 +135,48 @@ export class Vault {
     this.pClient = ins
   }
 
-  public async encrypt(key: string, plaintext: string): Promise<string> {
+  public async encrypt(key: string, plaintext: string, context?: string): Promise<string> {
     if (Vault.enabled) {
-      return this.encryptByVault(key, plaintext)
+      return this.encryptByVault(key, plaintext, context)
     } else {
       return Vault.ENCRYPT_IN_MEMORY(key, plaintext)
     }
   }
 
-  public async decrypt(key: string, ciphertext: string): Promise<string> {
+  public async decrypt(key: string, ciphertext: string, context?: string): Promise<string> {
     if (Vault.enabled) {
-      return this.decryptByVault(key, ciphertext)
+      return this.decryptByVault(key, ciphertext, context)
     } else {
       return Vault.DECRYPT_IN_MEMORY(key, ciphertext)
     }
   }
 
-  public async encryptByVault(key: string, plaintext: string): Promise<string> {
+  public async encryptByVault(key: string, plaintext: string, context?: string): Promise<string> {
     if (plaintext === '') {
       return ''
     }
 
     const route = Path.join(Vault.path, 'encrypt', key)
-    const res: AxiosResponse = await this.client.post(route, {
-      plaintext: Buffer.from(plaintext, 'utf8').toString('base64')
-    })
+    const data = { plaintext: Buffer.from(plaintext, 'utf8').toString('base64') }
+    if (Vault.derived && context !== undefined) {
+      data['context'] = Buffer.from(context, 'utf8').toString('base64')
+    }
+    const res: AxiosResponse = await this.client.post(route, data)
 
     return res.data.data.ciphertext
   }
 
-  public async decryptByVault(key: string, ciphertext: string): Promise<string> {
+  public async decryptByVault(key: string, ciphertext: string, context?: string): Promise<string> {
     if (ciphertext === '') {
       return ''
     }
 
     const route = Path.join(Vault.path, 'decrypt', key)
-    const res: AxiosResponse = await this.client.post(route, {
-      ciphertext: ciphertext
-    })
+    const data = { ciphertext: ciphertext }
+    if (Vault.derived && context !== undefined) {
+      data['context'] = Buffer.from(context, 'utf8').toString('base64')
+    }
+    const res: AxiosResponse = await this.client.post(route, data)
 
     return Buffer.from(res.data.data.plaintext, 'base64').toString('utf8')
   }
