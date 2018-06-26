@@ -19,6 +19,7 @@ export interface IConfig {
   path?: string
   timeout?: number
   ua?: string
+  derived?: boolean
 }
 
 export class Vault {
@@ -36,6 +37,7 @@ export class Vault {
   public static path: string
   public static timeout: number
   public static ua: string
+  public static derived: boolean
 
   private pClient: AxiosInstance
 
@@ -89,7 +91,8 @@ export class Vault {
       suffix: '_encrypted',
       path: 'v1/transit',
       timeout: sec * msec,
-      ua: Vault.DEFAULT_UA
+      ua: Vault.DEFAULT_UA,
+      derived: false
     }
   }
 
@@ -102,7 +105,8 @@ export class Vault {
       suffix: Vault.suffix,
       path: Vault.path,
       timeout: Vault.timeout,
-      ua: Vault.ua
+      ua: Vault.ua,
+      derived: Vault.derived
     }
   }
 
