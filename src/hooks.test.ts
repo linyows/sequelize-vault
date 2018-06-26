@@ -37,6 +37,8 @@ const User = sequelize.define('user', {
 
 sequelize['queryInterface'].createTable('users', schema)
 addHooks(User)
+
+// Hide stdout!!!!!!!!!!!!!!!!
 TD.replace(process.stdout, 'write')
 
 Test('when native, replace vault attributes "before save" to database', async (t) => {
