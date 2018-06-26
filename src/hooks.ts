@@ -1,18 +1,16 @@
 import {Vault} from './vault'
 
 const fields: object = {}
-let tableName: string = ''
 
 export function addHooks(model: any) {
-  tableName = model.tableName
-  fields[tableName] = {}
+  const table = model.tableName
+  fields[table] = {}
   const rawAttrs = model.rawAttributes
 
   for (const key of Object.keys(rawAttrs)) {
-    fields[tableName][rawAttrs[key]['field']] = rawAttrs[key]['fieldName']
+    fields[table][rawAttrs[key]['field']] = rawAttrs[key]['fieldName']
   }
 
-  model.beforeFind('loadAttributesOnBeforeFind', loadAttributesOnBeforeFind)
   model.afterFind('loadAttributesOnAfterFind', loadAttributesOnAfterFind)
   model.beforeCreate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
   model.beforeUpdate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
