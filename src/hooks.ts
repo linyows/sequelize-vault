@@ -20,14 +20,14 @@ export function addHooks(model: any) {
 
 // This requires "convergent_encryption" and "derived" to be set to true for vault.
 // See https://www.vaultproject.io/api/secret/transit/index.html#convergent_encryption
-export async function findOneByEncrypted<T>(model: any, cond: object): Promise<T> {
+export async function findOneByEncrypted<T>(model: any, cond: object, context?: string): Promise<T> {
   const table = model.tableName
   const keys = Object.keys(cond)
   const field = keys[0]
   const value = cond[field]
 
   const vault = new Vault()
-  const encrypted = await vault.encrypt(Vault.BUILD_PATH(table, field), value)
+  const encrypted = await vault.encrypt(Vault.BUILD_PATH(table, field), value, context)
   const where: object = {}
   where[`${field}${Vault.suffix}`] = encrypted
 
@@ -59,8 +59,15 @@ async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | un
     if (!ciphertext || ciphertext === '') {
       continue
     }
+
+    const contextFieldName = `${field}${Vault.contextSuffix}`
+    let context = undefined
+    if (fields[table][contextFieldName] !== undefined) {
+      context = ins.getDataValue(contextFieldName)
+    }
+
     const key = Vault.BUILD_PATH(table, replaced)
-    const plaintext = await vault.decrypt(key, ciphertext)
+    const plaintext = await vault.decrypt(key, ciphertext, context)
     ins.setDataValue(replaced, plaintext)
   }
 
@@ -83,8 +90,15 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
       if (!plaintext || plaintext === '') {
         continue
       }
+
+      const contextFieldName = `${field}${Vault.contextSuffix}`
+      let context = undefined
+      if (fields[table][contextFieldName] !== undefined) {
+        context = ins.getDataValue(contextFieldName)
+      }
+
       const key = Vault.BUILD_PATH(table, field)
-      const ciphertext = await vault.encrypt(key, plaintext)
+      const ciphertext = await vault.encrypt(key, plaintext, context)
       ins.setDataValue(fields[table][encryptedFieldName], ciphertext)
     }
   }
@@ -108,8 +122,15 @@ async function persistAttributesOnAfterSave(ins: any, opts: Object, fn?: Functio
       if (!ciphertext || ciphertext === '') {
         continue
       }
+
+      const contextFieldName = `${field}${Vault.contextSuffix}`
+      let context = undefined
+      if (fields[table][contextFieldName] !== undefined) {
+        context = ins.getDataValue(contextFieldName)
+      }
+
       const key = Vault.BUILD_PATH(table, replaced)
-      const plaintext = await vault.decrypt(key, ciphertext)
+      const plaintext = await vault.decrypt(key, ciphertext, context)
       ins.setDataValue(replaced, plaintext)
     }
   }

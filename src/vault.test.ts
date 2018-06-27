@@ -41,9 +41,9 @@ Test('#config returns default config', (t) => {
     address: 'https://vault.example.com',
     app: 'my-app',
     enabled: false,
-    derived: false,
     path: 'v1/transit',
     suffix: '_encrypted',
+    contextSuffix: '_context',
     token: 'abcd1234',
     timeout: 180000,
     ua: 'test'
@@ -57,9 +57,9 @@ Test('#config sets attributes as config', (t) => {
     address: 'http://vault',
     app: 'foo',
     enabled: false,
-    derived: false,
     path: 'v1/transit',
     suffix: '_encrypted',
+    contextSuffix: '_context',
     token: 'secret',
     timeout: 180000,
     ua: 'test'

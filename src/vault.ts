@@ -16,10 +16,10 @@ export interface IConfig {
   token?: string
   address?: string
   suffix?: string
+  contextSuffix?: string
   path?: string
   timeout?: number
   ua?: string
-  derived?: boolean
 }
 
 export class Vault {
@@ -37,7 +37,7 @@ export class Vault {
   public static path: string
   public static timeout: number
   public static ua: string
-  public static derived: boolean
+  public static contextSuffix: string
 
   private pClient: AxiosInstance
 
@@ -89,10 +89,10 @@ export class Vault {
       token: 'abcd1234',
       address: 'https://vault.example.com',
       suffix: '_encrypted',
+      contextSuffix: '_context',
       path: 'v1/transit',
       timeout: sec * msec,
-      ua: Vault.DEFAULT_UA,
-      derived: false
+      ua: Vault.DEFAULT_UA
     }
   }
 
@@ -103,10 +103,10 @@ export class Vault {
       token: Vault.token,
       address: Vault.address,
       suffix: Vault.suffix,
+      contextSuffix: Vault.contextSuffix,
       path: Vault.path,
       timeout: Vault.timeout,
-      ua: Vault.ua,
-      derived: Vault.derived
+      ua: Vault.ua
     }
   }
 
@@ -158,7 +158,7 @@ export class Vault {
 
     const route = Path.join(Vault.path, 'encrypt', key)
     const data = { plaintext: Buffer.from(plaintext, 'utf8').toString('base64') }
-    if (Vault.derived && context !== undefined) {
+    if (context !== undefined) {
       data['context'] = Buffer.from(context, 'utf8').toString('base64')
     }
     const res: AxiosResponse = await this.client.post(route, data)
@@ -173,7 +173,7 @@ export class Vault {
 
     const route = Path.join(Vault.path, 'decrypt', key)
     const data = { ciphertext: ciphertext }
-    if (Vault.derived && context !== undefined) {
+    if (context !== undefined) {
       data['context'] = Buffer.from(context, 'utf8').toString('base64')
     }
     const res: AxiosResponse = await this.client.post(route, data)
