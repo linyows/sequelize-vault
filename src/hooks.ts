@@ -2,22 +2,6 @@ import {Vault} from './vault'
 
 const fields: object = {}
 
-export function addHooks(model: any) {
-  const table = model.tableName
-  fields[table] = {}
-  const rawAttrs = model.rawAttributes
-
-  for (const key of Object.keys(rawAttrs)) {
-    fields[table][rawAttrs[key]['field']] = rawAttrs[key]['fieldName']
-  }
-
-  model.afterFind('loadAttributesOnAfterFind', loadAttributesOnAfterFind)
-  model.beforeCreate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
-  model.beforeUpdate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
-  model.afterCreate('persistAttributesOnAfterSave', persistAttributesOnAfterSave)
-  model.afterUpdate('persistAttributesOnAfterSave', persistAttributesOnAfterSave)
-}
-
 // This requires "convergent_encryption" and "derived" to be set to true for vault.
 // See https://www.vaultproject.io/api/secret/transit/index.html#convergent_encryption
 export async function findOneByEncrypted<T>(model: any, cond: object, context?: string): Promise<T> {
@@ -32,6 +16,22 @@ export async function findOneByEncrypted<T>(model: any, cond: object, context?: 
   where[`${field}${Vault.suffix}`] = encrypted
 
   return model.findOne({ where })
+}
+
+export function addHooks(model: any): void {
+  const table = model.tableName
+  fields[table] = {}
+  const rawAttrs = model.rawAttributes
+
+  for (const key of Object.keys(rawAttrs)) {
+    fields[table][rawAttrs[key]['field']] = rawAttrs[key]['fieldName']
+  }
+
+  model.afterFind('loadAttributesOnAfterFind', loadAttributesOnAfterFind)
+  model.beforeCreate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
+  model.beforeUpdate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
+  model.afterCreate('persistAttributesOnAfterSave', persistAttributesOnAfterSave)
+  model.afterUpdate('persistAttributesOnAfterSave', persistAttributesOnAfterSave)
 }
 
 async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | undefined): Promise<void> {
