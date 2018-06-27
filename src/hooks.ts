@@ -2,20 +2,9 @@ import {Vault} from './vault'
 
 const fields: object = {}
 
-export interface IModel {
-  tableName: string
-  rawAttributes: object
-  findOne: Function
-  afterFind: Function
-  beforeCreate: Function
-  beforeUpdate: Function
-  afterCreate: Function
-  afterUpdate: Function
-}
-
 // This requires "convergent_encryption" and "derived" to be set to true for vault.
 // See https://www.vaultproject.io/api/secret/transit/index.html#convergent_encryption
-export async function findOneByEncrypted<T extends IModel>(model: T, cond: object, context?: string): Promise<T> {
+export async function findOneByEncrypted<T>(model: any, cond: object, context?: string): Promise<T> {
   const table = model.tableName
   const keys = Object.keys(cond)
   const field = keys[0]
@@ -29,7 +18,7 @@ export async function findOneByEncrypted<T extends IModel>(model: T, cond: objec
   return model.findOne({ where })
 }
 
-export function addHooks<T extends IModel>(model: T): void {
+export function addHooks(model: any): void {
   const table = model.tableName
   fields[table] = {}
   const rawAttrs = model.rawAttributes
