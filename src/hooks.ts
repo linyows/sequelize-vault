@@ -61,7 +61,7 @@ async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | un
     }
 
     const contextFieldName = `${field}${Vault.contextSuffix}`
-    let context = undefined
+    let context
     if (fields[table][contextFieldName] !== undefined) {
       context = ins.getDataValue(contextFieldName)
     }
@@ -92,7 +92,7 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
       }
 
       const contextFieldName = `${field}${Vault.contextSuffix}`
-      let context = undefined
+      let context
       if (fields[table][contextFieldName] !== undefined) {
         context = ins.getDataValue(contextFieldName)
       }
@@ -124,7 +124,7 @@ async function persistAttributesOnAfterSave(ins: any, opts: Object, fn?: Functio
       }
 
       const contextFieldName = `${field}${Vault.contextSuffix}`
-      let context = undefined
+      let context
       if (fields[table][contextFieldName] !== undefined) {
         context = ins.getDataValue(contextFieldName)
       }
