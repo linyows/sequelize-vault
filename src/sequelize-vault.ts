@@ -1,5 +1,5 @@
 import {Vault, IConfig as Config} from './vault'
-import {addHooks as SequelizeVault} from './hooks'
+import {addHooks as SequelizeVault, findOneByEncrypted} from './hooks'
 
-export {Vault, Config}
+export {Vault, Config, findOneByEncrypted}
 export default SequelizeVault
