@@ -2,7 +2,34 @@ import {Vault} from './vault'
 
 const fields: object = {}
 
-export function addHooks(model: any) {
+export interface IModel {
+  tableName: string
+  rawAttributes: object
+  findOne: Function
+  afterFind: Function
+  beforeCreate: Function
+  beforeUpdate: Function
+  afterCreate: Function
+  afterUpdate: Function
+}
+
+// This requires "convergent_encryption" and "derived" to be set to true for vault.
+// See https://www.vaultproject.io/api/secret/transit/index.html#convergent_encryption
+export async function findOneByEncrypted<T extends IModel>(model: T, cond: object, context?: string): Promise<T> {
+  const table = model.tableName
+  const keys = Object.keys(cond)
+  const field = keys[0]
+  const value = cond[field]
+
+  const vault = new Vault()
+  const encrypted = await vault.encrypt(Vault.BUILD_PATH(table, field), value, context)
+  const where: object = {}
+  where[`${field}${Vault.suffix}`] = encrypted
+
+  return model.findOne({ where })
+}
+
+export function addHooks<T extends IModel>(model: T): void {
   const table = model.tableName
   fields[table] = {}
   const rawAttrs = model.rawAttributes
@@ -16,22 +43,6 @@ export function addHooks(model: any) {
   model.beforeUpdate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
   model.afterCreate('persistAttributesOnAfterSave', persistAttributesOnAfterSave)
   model.afterUpdate('persistAttributesOnAfterSave', persistAttributesOnAfterSave)
-}
-
-// This requires "convergent_encryption" and "derived" to be set to true for vault.
-// See https://www.vaultproject.io/api/secret/transit/index.html#convergent_encryption
-export async function findOneByEncrypted<T>(model: any, cond: object, context?: string): Promise<T> {
-  const table = model.tableName
-  const keys = Object.keys(cond)
-  const field = keys[0]
-  const value = cond[field]
-
-  const vault = new Vault()
-  const encrypted = await vault.encrypt(Vault.BUILD_PATH(table, field), value, context)
-  const where: object = {}
-  where[`${field}${Vault.suffix}`] = encrypted
-
-  return model.findOne({ where })
 }
 
 async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | undefined): Promise<void> {
