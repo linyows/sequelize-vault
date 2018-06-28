@@ -16,7 +16,8 @@ export interface IConfig {
   token?: string
   address?: string
   suffix?: string
-  contextSuffix?: string
+  convergented?: boolean
+  context?: string
   path?: string
   timeout?: number
   ua?: string
@@ -37,7 +38,8 @@ export class Vault {
   public static path: string
   public static timeout: number
   public static ua: string
-  public static contextSuffix: string
+  public static convergented: boolean
+  public static context: string
 
   private pClient: AxiosInstance
 
@@ -89,7 +91,8 @@ export class Vault {
       token: 'abcd1234',
       address: 'https://vault.example.com',
       suffix: '_encrypted',
-      contextSuffix: '_context',
+      convergented: false,
+      context: '',
       path: 'v1/transit',
       timeout: sec * msec,
       ua: Vault.DEFAULT_UA
@@ -103,7 +106,8 @@ export class Vault {
       token: Vault.token,
       address: Vault.address,
       suffix: Vault.suffix,
-      contextSuffix: Vault.contextSuffix,
+      convergented: Vault.convergented,
+      context: Vault.context,
       path: Vault.path,
       timeout: Vault.timeout,
       ua: Vault.ua
@@ -135,46 +139,52 @@ export class Vault {
     this.pClient = ins
   }
 
-  public async encrypt(key: string, plaintext: string, context?: string): Promise<string> {
+  public async encrypt(key: string, plaintext: string): Promise<string> {
     if (Vault.enabled) {
-      return this.encryptByVault(key, plaintext, context)
+      return this.encryptByVault(key, plaintext)
     } else {
       return Vault.ENCRYPT_IN_MEMORY(key, plaintext)
     }
   }
 
-  public async decrypt(key: string, ciphertext: string, context?: string): Promise<string> {
+  public async decrypt(key: string, ciphertext: string): Promise<string> {
     if (Vault.enabled) {
-      return this.decryptByVault(key, ciphertext, context)
+      return this.decryptByVault(key, ciphertext)
     } else {
       return Vault.DECRYPT_IN_MEMORY(key, ciphertext)
     }
   }
 
-  public async encryptByVault(key: string, plaintext: string, context?: string): Promise<string> {
+  public async encryptByVault(key: string, plaintext: string): Promise<string> {
     if (plaintext === '') {
       return ''
     }
 
     const route = Path.join(Vault.path, 'encrypt', key)
     const data = { plaintext: Buffer.from(plaintext, 'utf8').toString('base64') }
-    if (context !== undefined) {
-      data['context'] = Buffer.from(context, 'utf8').toString('base64')
+    if (Vault.convergented) {
+      if (Vault.context === '') {
+        Vault.context = Vault.app
+      }
+      data['context'] = Buffer.from(Vault.context, 'utf8').toString('base64')
     }
     const res: AxiosResponse = await this.client.post(route, data)
 
     return res.data.data.ciphertext
   }
 
-  public async decryptByVault(key: string, ciphertext: string, context?: string): Promise<string> {
+  public async decryptByVault(key: string, ciphertext: string): Promise<string> {
     if (ciphertext === '') {
       return ''
     }
 
     const route = Path.join(Vault.path, 'decrypt', key)
     const data = { ciphertext: ciphertext }
-    if (context !== undefined) {
-      data['context'] = Buffer.from(context, 'utf8').toString('base64')
+    if (Vault.convergented) {
+      if (Vault.context === '') {
+        Vault.context = Vault.app
+      }
+      data['context'] = Buffer.from(Vault.context, 'utf8').toString('base64')
     }
     const res: AxiosResponse = await this.client.post(route, data)
 
