@@ -29,7 +29,6 @@ const User = sequelize.define('user', {
   name: Sequelize.STRING,
   email_encrypted: Sequelize.STRING,
   email: Sequelize.VIRTUAL,
-  email_context: Sequelize.VIRTUAL,
 },
 {
   tableName: 'users',
@@ -101,9 +100,6 @@ class Person extends Model<Person> {
 
   @Column({ field: 'email_encrypted' })
   public emailEncrypted: string
-
-  @Column(DataType.VIRTUAL)
-  public emailContext: string
 }
 
 const schemaTS = {

@@ -43,7 +43,8 @@ Test('#config returns default config', (t) => {
     enabled: false,
     path: 'v1/transit',
     suffix: '_encrypted',
-    contextSuffix: '_context',
+    convergented: false,
+    context: '',
     token: 'abcd1234',
     timeout: 180000,
     ua: 'test'
@@ -59,7 +60,8 @@ Test('#config sets attributes as config', (t) => {
     enabled: false,
     path: 'v1/transit',
     suffix: '_encrypted',
-    contextSuffix: '_context',
+    convergented: false,
+    context: '',
     token: 'secret',
     timeout: 180000,
     ua: 'test'
