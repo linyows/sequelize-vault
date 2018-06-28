@@ -89,7 +89,8 @@ app           | my-app
 token         | abcd1234
 address       | https://vault.example.com
 suffix        | \_encrypted
-contextSuffix | \_context
+convergented  | true or false(default)
+context       | Vault.app(default)
 path          | v1/transit
 timeout       | 3 * 60 * 1000
 ua            | sequelize-vault/1.0.0 (+https://github....
