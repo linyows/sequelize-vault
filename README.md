@@ -3,7 +3,7 @@
 <p align="center"><strong>Sequelize Vault</strong>: A Sequelize plugin for easily integrating Hashicorp Vault.</p> <br>
 
 <p align="center">
-<a href="https://www.npmjs.com/package/sequelize-vault" title="npm"><img src="http://img.shields.io/npm/v/sequelize-vault.svg?style=for-the-badge"></a>
+<a href="https://www.npmjs.com/package/sequelize-vault" title="npm"><img src="https://img.shields.io/npm/v/sequelize-vault.svg?style=for-the-badge"></a>
 <a href="https://travis-ci.org/linyows/sequelize-vault" title="travis"><img src="https://img.shields.io/travis/linyows/sequelize-vault.svg?style=for-the-badge"></a>
 <a href="https://coveralls.io/github/linyows/sequelize-vault" title="coveralls"><img src="https://img.shields.io/coveralls/linyows/sequelize-vault.svg?style=for-the-badge"></a>
 <a href="https://github.com/linyows/sequelize-vault/blob/master/LICENSE" title="MIT License"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge"></a>
