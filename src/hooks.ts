@@ -62,7 +62,11 @@ async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | un
 
     const key = Vault.BUILD_PATH(table, replaced)
     const plaintext = await vault.decrypt(key, ciphertext)
-    ins.setDataValue(replaced, plaintext)
+    Object.keys(rawAttrs).forEach((rAttr) => {
+        if (rawAttrs[rAttr]['field'] === replaced) {
+            ins.setDataValue(rAttr, plaintext)
+        }
+    })
   }
 
   return fn !== undefined ? fn(null, ins) : ins
@@ -80,7 +84,7 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
       if (fields[table][encryptedFieldName] === undefined) {
         continue
       }
-      const plaintext = ins.getDataValue(field)
+      const plaintext = ins.getDataValue(f)
       if (!plaintext || plaintext === '') {
         continue
       }
