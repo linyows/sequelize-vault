@@ -262,6 +262,9 @@ Test('when typescript and postgres, replace vault attributes "before save" to da
   const name = genName()
   const a = Admin.build({name, email: 'foo@example.com', creditCardNumber: '0000111122223333'})
   await a.save()
+
   t.is(a.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
-  t.is(a.email, 'foo@example.com')
+  t.is(a.creditCardNumberEncrypted, 'KMT0s+O8EqtiezZo6xQbIGkZuRbEBM04hKxuDqQaNeA=')
+  t.is(a.email, null)
+  t.is(a.creditCardNumber, null)
 })
