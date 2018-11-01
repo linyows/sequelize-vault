@@ -100,6 +100,12 @@ class Person extends Model<Person> {
 
   @Column({ field: 'email_encrypted' })
   public emailEncrypted: string
+
+  @Column({ field: 'snake_cased_secret_value', type: DataType.VIRTUAL })
+  public snakeCasedSecretValue: string
+
+  @Column({ field: 'snake_cased_secret_value_encrypted' })
+  public snakeCasedSecretValueEncrypted: string
 }
 
 const schemaTS = {
@@ -110,6 +116,7 @@ const schemaTS = {
   },
   name: DataType.STRING,
   email_encrypted: DataType.STRING,
+  snake_cased_secret_value_encrypted: DataType.STRING,
 }
 
 sequelizeTS['queryInterface'].createTable('persons', schemaTS)
@@ -117,46 +124,54 @@ sequelizeTS.addModels([Person])
 addHooks(Person)
 
 Test('when typescript, replace vault attributes "before save" to database', async (t) => {
-  const p = Person.build({name: 'foobar', email: 'foo@example.com'})
+  const p = Person.build({name: 'foobar', email: 'foo@example.com', snakeCasedSecretValue: 'my secret value'})
   await p.save()
   t.is(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
   t.is(p.email, 'foo@example.com')
+  t.is(p.snakeCasedSecretValueEncrypted, 'W7IqykOlzYx+fGbjCxaWxw==')
+  t.is(p.snakeCasedSecretValue, 'my secret value')
 })
 
 Test('when typescript, replace vault attributes "before create" to database', async (t) => {
-  const p = await Person.create({name: 'foobar', email: 'foo@example.com'})
+  const p = await Person.create({name: 'foobar', email: 'foo@example.com', snakeCasedSecretValue: 'my secret value'})
   t.is(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
   t.is(p.email, 'foo@example.com')
+  t.is(p.snakeCasedSecretValueEncrypted, 'W7IqykOlzYx+fGbjCxaWxw==')
+  t.is(p.snakeCasedSecretValue, 'my secret value')
 })
 
 Test('when typescript, replace vault attributes "before update" to database', async (t) => {
-  const p = await Person.create({name: 'foobar', email: 'foo@example.com'})
+  const p = await Person.create({name: 'foobar', email: 'foo@example.com', snakeCasedSecretValue: 'my secret value'})
   p.email = 'foo-to-zoo@example.com'
   await p.save()
   t.not(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
   t.is(p.email, 'foo-to-zoo@example.com')
+  t.is(p.snakeCasedSecretValueEncrypted, 'W7IqykOlzYx+fGbjCxaWxw==')
+  t.is(p.snakeCasedSecretValue, 'my secret value')
 })
 
 Test('when typescript, set vault attributes "after find" to database', async (t) => {
-  await Person.create({name: 'foobaz', email: 'foo@example.com'})
+  await Person.create({name: 'foobaz', email: 'foo@example.com', snakeCasedSecretValue: 'my secret secret value'})
   const p = await Person.findOne<Person>({where: { name: 'foobaz' }})
   if (p === null) {
     return
   }
   t.is(p.email, 'foo@example.com')
+  t.is(p.snakeCasedSecretValue, 'my secret secret value')
 })
 
 Test('when typescript, use findOneByEncrypted', async (t) => {
-  await Person.create({name: 'foobaz', email: 'foo@example.com'})
-  const p = await findOneByEncrypted<Person>(Person, { email: 'foo@example.com' })
+  await Person.create({name: 'foobaz', email: 'baz@example.com', snakeCasedSecretValue: 'my secret secret secret value'})
+  const p = await findOneByEncrypted<Person>(Person, { email: 'baz@example.com' })
   if (p === null) {
     return
   }
-  t.is(p.email, 'foo@example.com')
+  t.is(p.email, 'baz@example.com')
+  t.is(p.snakeCasedSecretValue, 'my secret secret secret value')
 })
 
 Test('when typescript, skip decrypt on "find all"', async (t) => {
-  await Person.create({name: 'findall', email: 'findall@example.com'})
+  await Person.create({name: 'findall', email: 'findall@example.com', snakeCasedSecretValue: 'my secret value'})
   const persons = await Person.findAll<Person>()
   t.is(persons[persons.length-1].name, 'findall')
   t.is(persons[persons.length-1].email, undefined)
