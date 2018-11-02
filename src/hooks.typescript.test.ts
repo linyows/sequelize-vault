@@ -88,6 +88,19 @@ Test('set vault attributes "after find" to database', async (t) => {
   t.is(p.creditCardNumber, '0000111122223333')
 })
 
+Test('set vault attributes "after find" to database, when findAll', async (t) => {
+  await Person.create({name: 'findall', email: 'findall@example.com', creditCardNumber: '0000111122223333'})
+  const persons = await Person.findAll<Person>()
+  for (let p of persons) {
+    if (p.name === 'findall') {
+      t.is(p.email, 'findall@example.com')
+      t.is(p.emailEncrypted, 'BRbdmy3GTxnMNVdDUmX4njI23FczaEzUmwaKm7we0FY=')
+      t.is(p.creditCardNumber, '0000111122223333')
+      t.is(p.creditCardNumberEncrypted, 'KMT0s+O8EqtiezZo6xQbIGkZuRbEBM04hKxuDqQaNeA=')
+    }
+  }
+})
+
 Test('use findOneByEncrypted', async (t) => {
   const name = genName()
   const email = genEmail()
@@ -98,12 +111,4 @@ Test('use findOneByEncrypted', async (t) => {
   }
   t.is(p.email, email)
   t.is(p.creditCardNumber, '0000111122223333')
-})
-
-Test('skip decrypt on "find all"', async (t) => {
-  await Person.create({name: 'findall', email: 'findall@example.com', creditCardNumber: '0000111122223333'})
-  const persons = await Person.findAll<Person>()
-  t.is(persons[persons.length-1].name, 'findall')
-  t.is(persons[persons.length-1].email, undefined)
-  t.is(persons[persons.length-1].creditCardNumber, undefined)
 })

@@ -80,6 +80,19 @@ Test('set vault attributes "after find" to database', async (t) => {
   t.is(u.credit_card_number, '0000111122223333')
 })
 
+Test('set vault attributes "after find" to database, when findAll', async (t) => {
+  await User.create({name: 'findall', email: 'findall@example.com', credit_card_number: '0000111122223333'})
+  const users = await User.findAll()
+  for (let u of users) {
+    if (u.name === 'findall') {
+      t.is(u.email, 'findall@example.com')
+      t.is(u.email_encrypted, 'BRbdmy3GTxnMNVdDUmX4njI23FczaEzUmwaKm7we0FY=')
+      t.is(u.credit_card_number, '0000111122223333')
+      t.is(u.credit_card_number_encrypted, 'KMT0s+O8EqtiezZo6xQbIGkZuRbEBM04hKxuDqQaNeA=')
+    }
+  }
+})
+
 Test('use findOneByEncrypted', async (t) => {
   const name = genName()
   const email = genEmail()
@@ -87,12 +100,4 @@ Test('use findOneByEncrypted', async (t) => {
   const u = await findOneByEncrypted(User, { email }) as any
   t.is(u.email, email)
   t.is(u.credit_card_number, '0000111122223333')
-})
-
-Test('skip decrypt on "find all"', async (t) => {
-  await User.create({name: 'findall', email: 'findall@example.com', credit_card_number: '0000111122223333'})
-  const users = await User.findAll()
-  t.is(users[users.length-1].name, 'findall')
-  t.is(users[users.length-1].email, undefined)
-  t.is(users[users.length-1].credit_card_number, undefined)
 })
