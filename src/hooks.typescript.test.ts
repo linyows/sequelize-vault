@@ -1,0 +1,109 @@
+import Test from 'ava'
+import {addHooks, findOneByEncrypted} from './hooks'
+import {genTable, genName, genEmail} from './test-helper'
+import {Sequelize, Table, Column, Model, DataType} from 'sequelize-typescript'
+
+const table = genTable()
+
+const sequelize = new Sequelize({
+  database: 'test-typescript',
+  dialect: 'sqlite',
+  username: 'root',
+  password: '',
+  storage: ':memory:',
+  operatorsAliases: false,
+})
+
+@Table({ tableName: table })
+class Person extends Model<Person> {
+  @Column
+  public name: string
+
+  @Column(DataType.VIRTUAL)
+  public email: string
+
+  @Column({ field: 'email_encrypted' })
+  public emailEncrypted: string
+
+  @Column({ field: 'credit_card_number', type: DataType.VIRTUAL })
+  public creditCardNumber: string
+
+  @Column({ field: 'credit_card_number_encrypted' })
+  public creditCardNumberEncrypted: string
+}
+
+const schema = {
+  id: {
+    type: DataType.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  name: DataType.STRING,
+  email_encrypted: DataType.STRING,
+  credit_card_number_encrypted: DataType.STRING,
+}
+
+sequelize['queryInterface'].createTable(table, schema)
+sequelize.addModels([Person])
+addHooks(Person)
+
+Test('replace vault attributes "before save" to database', async (t) => {
+  const name = genName()
+  const p = Person.build({name, email: 'foo@example.com', creditCardNumber: '0000111122223333'})
+  await p.save()
+  t.is(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
+  t.is(p.email, 'foo@example.com')
+  t.is(p.creditCardNumberEncrypted, 'KMT0s+O8EqtiezZo6xQbIGkZuRbEBM04hKxuDqQaNeA=')
+  t.is(p.creditCardNumber, '0000111122223333')
+})
+
+Test('replace vault attributes "before create" to database', async (t) => {
+  const name = genName()
+  const p = await Person.create({name, email: 'foo@example.com', creditCardNumber: '0000111122223333'})
+  t.is(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
+  t.is(p.email, 'foo@example.com')
+  t.is(p.creditCardNumberEncrypted, 'KMT0s+O8EqtiezZo6xQbIGkZuRbEBM04hKxuDqQaNeA=')
+  t.is(p.creditCardNumber, '0000111122223333')
+})
+
+Test('replace vault attributes "before update" to database', async (t) => {
+  const name = genName()
+  const p = await Person.create({name, email: 'foo@example.com', creditCardNumber: '0000111122223333'})
+  p.email = 'foo-to-zoo@example.com'
+  await p.save()
+  t.not(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
+  t.is(p.email, 'foo-to-zoo@example.com')
+  t.is(p.creditCardNumberEncrypted, 'KMT0s+O8EqtiezZo6xQbIGkZuRbEBM04hKxuDqQaNeA=')
+  t.is(p.creditCardNumber, '0000111122223333')
+})
+
+Test('set vault attributes "after find" to database', async (t) => {
+  const name = genName()
+  await Person.create({name, email: 'foo@example.com', creditCardNumber: '0000111122223333'})
+  const p = await Person.findOne<Person>({where: { name }})
+  if (p === null) {
+    return
+  }
+  t.is(p.email, 'foo@example.com')
+  t.is(p.creditCardNumber, '0000111122223333')
+})
+
+Test('use findOneByEncrypted', async (t) => {
+  const name = genName()
+  const email = genEmail()
+  await Person.create({name, email, creditCardNumber: '0000111122223333'})
+  const p = await findOneByEncrypted<Person>(Person, { email })
+  if (p === null) {
+    return
+  }
+  t.is(p.email, email)
+  t.is(p.creditCardNumber, '0000111122223333')
+})
+
+Test('skip decrypt on "find all"', async (t) => {
+  await Person.create({name: 'findall', email: 'findall@example.com', creditCardNumber: '0000111122223333'})
+  const persons = await Person.findAll<Person>()
+  t.is(persons[persons.length-1].name, 'findall')
+  t.is(persons[persons.length-1].email, undefined)
+  t.is(persons[persons.length-1].creditCardNumber, undefined)
+})
