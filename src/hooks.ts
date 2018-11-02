@@ -34,20 +34,30 @@ export function addHooks(model: any): void {
   model.afterUpdate('persistAttributesOnAfterSave', persistAttributesOnAfterSave)
 }
 
-async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | undefined): Promise<void> {
-  if (ins === null) {
+async function loadAttributesOnAfterFind(instancesOrInstance: any, _: any, fn?: Function | undefined): Promise<void> {
+  if (instancesOrInstance === null) {
     return
   }
 
+  if (Array.isArray(instancesOrInstance)) {
+    for (let ins of instancesOrInstance) {
+      await loadAttributes(ins, fn)
+    }
+  } else {
+    return loadAttributes(instancesOrInstance, fn)
+  }
+}
+
+async function loadAttributes(instance: any, fn?: Function | undefined): Promise<void> {
   const vault = new Vault()
-  const arrayAttrs = ins.constructor.prototype.attributes
+  const arrayAttrs = instance.constructor.prototype.attributes
 
   if (!Array.isArray(arrayAttrs)) {
-    return fn !== undefined ? fn(null, ins) : ins
+    return fn !== undefined ? fn(null, instance) : instance
   }
 
-  const rawAttrs = ins.constructor.prototype.rawAttributes
-  const table = ins.constructor.tableName
+  const rawAttrs = instance.constructor.prototype.rawAttributes
+  const table = instance.constructor.tableName
 
   for (const attr of arrayAttrs) {
     const field = rawAttrs === undefined ? attr : rawAttrs[attr]['field']
@@ -55,7 +65,7 @@ async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | un
     if (replaced === field) {
       continue
     }
-    const ciphertext = ins.getDataValue(attr)
+    const ciphertext = instance.getDataValue(attr)
     if (!ciphertext || ciphertext === '') {
       continue
     }
@@ -64,12 +74,12 @@ async function loadAttributesOnAfterFind(ins: any, _: Object, fn?: Function | un
     const plaintext = await vault.decrypt(key, ciphertext)
     Object.keys(rawAttrs).forEach((rAttr) => {
         if (rawAttrs[rAttr]['field'] === replaced) {
-            ins.setDataValue(rAttr, plaintext)
+            instance.setDataValue(rAttr, plaintext)
         }
     })
   }
 
-  return fn !== undefined ? fn(null, ins) : ins
+  return fn !== undefined ? fn(null, instance) : instance
 }
 
 async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Function | undefined): Promise<void> {
