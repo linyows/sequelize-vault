@@ -46,7 +46,8 @@
   },
   "linterOptions": {
     "exclude": [
-      "**/*.test.ts"
+      "**/*.test.ts",
+      "**/testhelper.ts"
     ]
   },
   "rulesDirectory": [
