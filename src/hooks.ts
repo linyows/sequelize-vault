@@ -40,7 +40,7 @@ async function loadAttributesOnAfterFind(instancesOrInstance: any, _: any, fn?: 
   }
 
   if (Array.isArray(instancesOrInstance)) {
-    for (let ins of instancesOrInstance) {
+    for (const ins of instancesOrInstance) {
       await loadAttributes(ins, fn)
     }
   } else {
