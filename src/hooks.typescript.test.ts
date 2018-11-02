@@ -1,6 +1,6 @@
 import Test from 'ava'
 import {addHooks, findOneByEncrypted} from './hooks'
-import {genTable, genName, genEmail} from './test-helper'
+import {genTable, genName, genEmail} from './testhelper.test'
 import {Sequelize, Table, Column, Model, DataType} from 'sequelize-typescript'
 
 const table = genTable()

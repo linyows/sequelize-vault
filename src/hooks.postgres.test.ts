@@ -1,6 +1,6 @@
 import Test from 'ava'
 import {addHooks} from './hooks'
-import {genTable, genName} from './test-helper'
+import {genTable, genName} from './testhelper.test'
 import {Sequelize, Table, Column, Model, DataType} from 'sequelize-typescript'
 
 const table = genTable()
