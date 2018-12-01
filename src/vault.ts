@@ -74,7 +74,10 @@ export class Vault {
   public static MEMORY_FOR_KEY(key: string): string {
     const length = 16
 
-    return Buffer.from(`${Vault.path}/${key}`, 'utf8').toString('base64').substr(0, length)
+    return Buffer
+      .from(`${Vault.path}/${key}`, 'utf8')
+      .toString('base64')
+      .substr(0, length)
   }
 
   public static RESET(): void {
@@ -161,12 +164,18 @@ export class Vault {
     }
 
     const route = Path.join(Vault.path, 'encrypt', key)
-    const data = { plaintext: Buffer.from(plaintext, 'utf8').toString('base64') }
+    const data = {
+      plaintext: Buffer
+        .from(plaintext, 'utf8')
+        .toString('base64')
+    }
     if (Vault.convergented) {
       if (Vault.context === '') {
         Vault.context = Vault.app
       }
-      data['context'] = Buffer.from(Vault.context, 'utf8').toString('base64')
+      data['context'] = Buffer
+        .from(Vault.context, 'utf8')
+        .toString('base64')
     }
     const res: AxiosResponse = await this.client.post(route, data)
 
@@ -184,11 +193,15 @@ export class Vault {
       if (Vault.context === '') {
         Vault.context = Vault.app
       }
-      data['context'] = Buffer.from(Vault.context, 'utf8').toString('base64')
+      data['context'] = Buffer
+        .from(Vault.context, 'utf8')
+        .toString('base64')
     }
     const res: AxiosResponse = await this.client.post(route, data)
 
-    return Buffer.from(res.data.data.plaintext, 'base64').toString('utf8')
+    return Buffer
+      .from(res.data.data.plaintext, 'base64')
+      .toString('utf8')
   }
 }
 

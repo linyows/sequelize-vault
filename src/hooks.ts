@@ -72,7 +72,9 @@ async function loadAttributes(instance: any, fn?: Function | undefined): Promise
 
     const key = Vault.BUILD_PATH(table, replaced)
     const plaintext = await vault.decrypt(key, ciphertext)
-    Object.keys(rawAttrs).forEach((rAttr) => {
+    Object
+      .keys(rawAttrs)
+      .forEach((rAttr) => {
         if (rawAttrs[rAttr]['field'] === replaced) {
             instance.setDataValue(rAttr, plaintext)
         }
