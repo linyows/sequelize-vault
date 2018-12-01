@@ -34,7 +34,7 @@
     "testdouble": "^3.8.1",
     "ts-node": "^7.0.0",
     "tslint": "^5.10.0",
-    "tslint-microsoft-contrib": "^5.0.3",
+    "tslint-microsoft-contrib": "^6.0.0",
     "typescript": "^2.8.3"
   },
   "engines": {
