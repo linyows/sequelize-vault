@@ -53,7 +53,7 @@ async function loadAttributes(instance: any, fn?: Function | undefined): Promise
   const arrayAttrs = instance.constructor.prototype.attributes
 
   if (!Array.isArray(arrayAttrs)) {
-    return fn !== undefined ? fn(null, instance) : instance
+    return fn !== undefined ? fn(undefined, instance) : instance
   }
 
   const rawAttrs = instance.constructor.prototype.rawAttributes
@@ -72,14 +72,16 @@ async function loadAttributes(instance: any, fn?: Function | undefined): Promise
 
     const key = Vault.BUILD_PATH(table, replaced)
     const plaintext = await vault.decrypt(key, ciphertext)
-    Object.keys(rawAttrs).forEach((rAttr) => {
+    Object
+      .keys(rawAttrs)
+      .forEach((rAttr) => {
         if (rawAttrs[rAttr]['field'] === replaced) {
             instance.setDataValue(rAttr, plaintext)
         }
     })
   }
 
-  return fn !== undefined ? fn(null, instance) : instance
+  return fn !== undefined ? fn(undefined, instance) : instance
 }
 
 async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Function | undefined): Promise<void> {
@@ -106,7 +108,7 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
     }
   }
 
-  return fn !== undefined ? fn(null, ins) : ins
+  return fn !== undefined ? fn(undefined, ins) : ins
 }
 
 async function persistAttributesOnAfterSave(ins: any, opts: Object, fn?: Function | undefined): Promise<void> {
@@ -132,5 +134,5 @@ async function persistAttributesOnAfterSave(ins: any, opts: Object, fn?: Functio
     }
   }
 
-  return fn !== undefined ? fn(null, ins) : ins
+  return fn !== undefined ? fn(undefined, ins) : ins
 }
