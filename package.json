@@ -56,7 +56,7 @@
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf lib",
-    "ci": "npm install && npm run lint && npm run db:create && nyc ava-ts -v && nsp check",
+    "ci": "npm install && npm run lint && npm run db:create && nyc ava-ts -v && npm audit",
     "test": "npm run db:create && ava-ts -v ; npm run db:drop",
     "cov": "nyc npm test",
     "lint": "tslint -p tsconfig.json -c tslint.json src/**/*.ts",
