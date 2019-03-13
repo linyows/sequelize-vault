@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "sequelize": "^4.37.7"
+    "sequelize": "^5.1.0"
   },
   "devDependencies": {
     "@types/node": "11.11.2",
