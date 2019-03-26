@@ -1,12 +1,9 @@
-<p align="center"><a href="http://docs.sequelizejs.com/"><img src="https://polidog.jp/images/sequelize.png" height="80" align="middle"></a> <a href="https://www.vaultproject.io/"><img src="https://s3.amazonaws.com/hashicorp-marketing-web-assets/brand/Vault_PrimaryLogo_FullColor.HkwAATB6e.svg" height="65" align="middle"></a></p>
+<h1 align="center"><a href="http://docs.sequelizejs.com/"><img src="https://polidog.jp/images/sequelize.png" height="80" align="middle"></a> <a href="https://www.vaultproject.io/"><img src="https://s3.amazonaws.com/hashicorp-marketing-web-assets/brand/Vault_PrimaryLogo_FullColor.HkwAATB6e.svg" height="65" align="middle"></a></h1>
 
 <p align="center"><strong>Sequelize Vault</strong>: A Sequelize plugin for easily integrating Hashicorp Vault.</p> <br>
 
 <p align="center">
-<a href="https://www.npmjs.com/package/sequelize-vault" title="npm"><img src="https://img.shields.io/npm/v/sequelize-vault.svg?style=for-the-badge"></a>
-<a href="https://travis-ci.org/linyows/sequelize-vault" title="travis"><img src="https://img.shields.io/travis/linyows/sequelize-vault.svg?style=for-the-badge"></a>
-<a href="https://coveralls.io/github/linyows/sequelize-vault" title="coveralls"><img src="https://img.shields.io/coveralls/linyows/sequelize-vault.svg?style=for-the-badge"></a>
-<a href="https://github.com/linyows/sequelize-vault/blob/master/LICENSE" title="MIT License"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge"></a>
+<a href="https://www.npmjs.com/package/sequelize-vault" title="npm"><img src="https://img.shields.io/npm/v/sequelize-vault.svg?style=for-the-badge"></a><a href="https://travis-ci.org/linyows/sequelize-vault" title="travis"><img src="https://img.shields.io/travis/linyows/sequelize-vault.svg?style=for-the-badge"></a><a href="https://codecov.io/gh/linyows/sequelize-vault" title="codecov.io"><img src="https://img.shields.io/codecov/c/gh/linyows/sequelize-vault.svg?style=for-the-badge"></a><a href="https://github.com/linyows/sequelize-vault/blob/master/LICENSE" title="MIT License"><img src="https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge"></a>
 </p> <br><br><br>
 
 Installation
