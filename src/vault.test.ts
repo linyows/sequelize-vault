@@ -71,6 +71,7 @@ Test('#config sets attributes as config', (t) => {
 })
 
 Test('.client returns a axios instance', (t) => {
+  Vault.RESET()
   const v = new Vault()
   t.is(v.client.defaults.baseURL, 'https://vault.example.com')
   t.is(v.client.defaults.timeout, 180000)
