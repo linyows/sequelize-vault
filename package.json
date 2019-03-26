@@ -1,6 +1,6 @@
 {
   "name": "sequelize-vault",
-  "version": "4.0.0",
+  "version": "5.0.0",
   "description": "A Sequelize plugin for easily integrating Hashicorp Vault",
   "main": "index.js",
   "types": "lib/sequelize-vault.d.ts",
