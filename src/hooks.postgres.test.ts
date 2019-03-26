@@ -1,7 +1,7 @@
 import Test from 'ava'
 import {addHooks} from './hooks'
 import {genTable, genName} from './testhelper'
-import {Sequelize, Table, Column, Model, DataType} from 'sequelize-typescript'
+import {Sequelize, SequelizeOptions, Table, Column, Model, DataType} from 'sequelize-typescript'
 
 const table = genTable()
 
@@ -21,16 +21,21 @@ class Admin extends Model<Admin> {
 
   @Column({ field: 'credit_card_number_encrypted' })
   public creditCardNumberEncrypted: string
+
+  @Column({ field: 'created_at' })
+  public createdAt: Date
+
+  @Column({ field: 'updated_at' })
+  public updatedAt: Date
 }
 
 Test.before(async () => {
   const sequelize = new Sequelize({
-    name: 'sequelizevault',
+    database: 'sequelizevault',
     dialect: 'postgres',
     username: 'sequelizevault',
     password: '',
-    operatorsAliases: false,
-  })
+  } as SequelizeOptions)
 
   const schema = {
     id: {
@@ -44,6 +49,8 @@ Test.before(async () => {
     // If the column of virtual type exists, its value is returned as null.
     email: DataType.STRING,
     credit_card_number: DataType.STRING,
+    created_at: DataType.DATE,
+    updated_at: DataType.DATE,
   }
 
   await sequelize['queryInterface'].createTable(table, schema)

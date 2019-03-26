@@ -11,7 +11,6 @@ const sequelize =  new Sequelize({
   username: 'root',
   password: '',
   storage: ':memory:',
-  operatorsAliases: false,
 })
 
 const schema = {

@@ -1,7 +1,7 @@
 import Test from 'ava'
-import {addHooks, findOneByEncrypted} from './hooks'
+import {addHooks, findOneByEncrypted, loadAttributesOnAfterFind, loadAttributes, persistAttributesOnAfterSave} from './hooks'
 import {genTable, genName, genEmail} from './testhelper'
-import {Sequelize, Table, Column, Model, DataType} from 'sequelize-typescript'
+import {Sequelize, SequelizeOptions, Table, Column, Model, DataType} from 'sequelize-typescript'
 
 const table = genTable()
 
@@ -11,8 +11,7 @@ const sequelize = new Sequelize({
   username: 'root',
   password: '',
   storage: ':memory:',
-  operatorsAliases: false,
-})
+} as SequelizeOptions)
 
 @Table({ tableName: table })
 class Person extends Model<Person> {
@@ -30,6 +29,12 @@ class Person extends Model<Person> {
 
   @Column({ field: 'credit_card_number_encrypted' })
   public creditCardNumberEncrypted: string
+
+  @Column({ field: 'created_at' })
+  public createdAt: Date
+
+  @Column({ field: 'updated_at' })
+  public updatedAt: Date
 }
 
 const schema = {
@@ -41,11 +46,28 @@ const schema = {
   name: DataType.STRING,
   email_encrypted: DataType.STRING,
   credit_card_number_encrypted: DataType.STRING,
+  created_at: DataType.DATE,
+  updated_at: DataType.DATE,
 }
 
 sequelize['queryInterface'].createTable(table, schema)
 sequelize.addModels([Person])
 addHooks(Person)
+
+Test('.loadAttributesOnAfterFind', async (t) => {
+  const res = await loadAttributesOnAfterFind({}, (() => {}))
+  t.is(typeof res, 'object')
+})
+
+Test('.loadAttributes', async (t) => {
+  const res = await loadAttributes({}, (() => {}))
+  t.is(typeof res, 'undefined')
+})
+
+Test('.persistAttributesOnAfterSave', async (t) => {
+  const res = await persistAttributesOnAfterSave({}, {})
+  t.is(typeof res, 'object')
+})
 
 Test('replace vault attributes "before save" to database', async (t) => {
   const name = genName()

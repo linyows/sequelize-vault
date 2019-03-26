@@ -27,6 +27,8 @@ export function addHooks(model: any): void {
     fields[table][rawAttrs[key]['field']] = rawAttrs[key]['fieldName']
   }
 
+  // see sequelize hooks
+  // https://github.com/sequelize/sequelize/blob/830357553d15ecf41652ec997926bd5cf442eb17/lib/hooks.js#L8-L49
   model.afterFind('loadAttributesOnAfterFind', loadAttributesOnAfterFind)
   model.beforeCreate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
   model.beforeUpdate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
@@ -34,7 +36,7 @@ export function addHooks(model: any): void {
   model.afterUpdate('persistAttributesOnAfterSave', persistAttributesOnAfterSave)
 }
 
-async function loadAttributesOnAfterFind(instancesOrInstance: any, _: any, fn?: Function | undefined): Promise<void> {
+export async function loadAttributesOnAfterFind(instancesOrInstance: any, _: any, fn?: Function | undefined): Promise<void> {
   if (instancesOrInstance === null) {
     return
   }
@@ -48,9 +50,12 @@ async function loadAttributesOnAfterFind(instancesOrInstance: any, _: any, fn?: 
   }
 }
 
-async function loadAttributes(instance: any, fn?: Function | undefined): Promise<void> {
+export async function loadAttributes(instance: any, fn?: Function | undefined): Promise<void> {
   const vault = new Vault()
-  const arrayAttrs = instance.constructor.prototype.attributes
+
+  // For sequelize ver5
+  const arrayAttrs = (instance._options !== undefined && instance._options.attributes !== undefined) ?
+    instance._options.attributes : instance.constructor.prototype.attributes
 
   if (!Array.isArray(arrayAttrs)) {
     return fn !== undefined ? fn(undefined, instance) : instance
@@ -111,7 +116,7 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
   return fn !== undefined ? fn(undefined, ins) : ins
 }
 
-async function persistAttributesOnAfterSave(ins: any, opts: Object, fn?: Function | undefined): Promise<void> {
+export async function persistAttributesOnAfterSave(ins: any, opts: Object, fn?: Function | undefined): Promise<void> {
   if (opts['fields'] !== undefined) {
     const vault = new Vault()
     const rawAttrs = ins.constructor.prototype.rawAttributes
