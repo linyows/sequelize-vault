@@ -50,7 +50,10 @@ async function loadAttributesOnAfterFind(instancesOrInstance: any, _: any, fn?: 
 
 async function loadAttributes(instance: any, fn?: Function | undefined): Promise<void> {
   const vault = new Vault()
-  const arrayAttrs = instance.constructor.prototype.attributes
+
+  // For sequelize ver5
+  const arrayAttrs = (typeof instance._options !== 'undefined' && typeof instance._options.attributes !== 'undefined') ?
+    instance._options.attributes : instance.constructor.prototype.attributes
 
   if (!Array.isArray(arrayAttrs)) {
     return fn !== undefined ? fn(undefined, instance) : instance
