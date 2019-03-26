@@ -27,6 +27,8 @@ export function addHooks(model: any): void {
     fields[table][rawAttrs[key]['field']] = rawAttrs[key]['fieldName']
   }
 
+  // see sequelize hooks
+  // https://github.com/sequelize/sequelize/blob/830357553d15ecf41652ec997926bd5cf442eb17/lib/hooks.js#L8-L49
   model.afterFind('loadAttributesOnAfterFind', loadAttributesOnAfterFind)
   model.beforeCreate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
   model.beforeUpdate('persistAttributesOnBeforeSave', persistAttributesOnBeforeSave)
