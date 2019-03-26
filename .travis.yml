@@ -6,7 +6,7 @@ script:
 services:
   - postgresql
 after_success:
-  - './node_modules/.bin/nyc report --reporter=text-lcov | ./node_modules/.bin/coveralls'
+  - npm run cov:report
 notifications:
   slack: linyows:2oeZ2qcLnaMjbnEYodwEXKTr
   email: false
