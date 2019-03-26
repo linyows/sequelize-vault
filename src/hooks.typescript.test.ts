@@ -1,7 +1,7 @@
 import Test from 'ava'
 import {addHooks, findOneByEncrypted} from './hooks'
 import {genTable, genName, genEmail} from './testhelper'
-import {Sequelize, Table, Column, Model, DataType} from 'sequelize-typescript'
+import {Sequelize, SequelizeOptions, Table, Column, Model, DataType} from 'sequelize-typescript'
 
 const table = genTable()
 
@@ -11,7 +11,7 @@ const sequelize = new Sequelize({
   username: 'root',
   password: '',
   storage: ':memory:',
-})
+} as SequelizeOptions)
 
 @Table({ tableName: table })
 class Person extends Model<Person> {
@@ -29,6 +29,12 @@ class Person extends Model<Person> {
 
   @Column({ field: 'credit_card_number_encrypted' })
   public creditCardNumberEncrypted: string
+
+  @Column({ field: 'created_at' })
+  public createdAt: Date
+
+  @Column({ field: 'updated_at' })
+  public updatedAt: Date
 }
 
 const schema = {
@@ -40,6 +46,8 @@ const schema = {
   name: DataType.STRING,
   email_encrypted: DataType.STRING,
   credit_card_number_encrypted: DataType.STRING,
+  created_at: DataType.DATE,
+  updated_at: DataType.DATE,
 }
 
 sequelize['queryInterface'].createTable(table, schema)
