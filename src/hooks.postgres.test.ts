@@ -29,7 +29,6 @@ Test.before(async () => {
     dialect: 'postgres',
     username: 'sequelizevault',
     password: '',
-    operatorsAliases: false,
   })
 
   const schema = {
