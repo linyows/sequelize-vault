@@ -54,7 +54,7 @@ async function loadAttributes(instance: any, fn?: Function | undefined): Promise
   const vault = new Vault()
 
   // For sequelize ver5
-  const arrayAttrs = (typeof instance._options !== 'undefined' && typeof instance._options.attributes !== 'undefined') ?
+  const arrayAttrs = (instance._options !== undefined && instance._options.attributes !== undefined) ?
     instance._options.attributes : instance.constructor.prototype.attributes
 
   if (!Array.isArray(arrayAttrs)) {
