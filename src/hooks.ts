@@ -36,7 +36,7 @@ export function addHooks(model: any): void {
   model.afterUpdate('persistAttributesOnAfterSave', persistAttributesOnAfterSave)
 }
 
-async function loadAttributesOnAfterFind(instancesOrInstance: any, _: any, fn?: Function | undefined): Promise<void> {
+export async function loadAttributesOnAfterFind(instancesOrInstance: any, _: any, fn?: Function | undefined): Promise<void> {
   if (instancesOrInstance === null) {
     return
   }
@@ -50,7 +50,7 @@ async function loadAttributesOnAfterFind(instancesOrInstance: any, _: any, fn?: 
   }
 }
 
-async function loadAttributes(instance: any, fn?: Function | undefined): Promise<void> {
+export async function loadAttributes(instance: any, fn?: Function | undefined): Promise<void> {
   const vault = new Vault()
 
   // For sequelize ver5
@@ -116,7 +116,7 @@ async function persistAttributesOnBeforeSave(ins: any, opts: Object, fn?: Functi
   return fn !== undefined ? fn(undefined, ins) : ins
 }
 
-async function persistAttributesOnAfterSave(ins: any, opts: Object, fn?: Function | undefined): Promise<void> {
+export async function persistAttributesOnAfterSave(ins: any, opts: Object, fn?: Function | undefined): Promise<void> {
   if (opts['fields'] !== undefined) {
     const vault = new Vault()
     const rawAttrs = ins.constructor.prototype.rawAttributes

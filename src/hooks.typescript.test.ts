@@ -1,5 +1,5 @@
 import Test from 'ava'
-import {addHooks, findOneByEncrypted} from './hooks'
+import {addHooks, findOneByEncrypted, loadAttributesOnAfterFind, loadAttributes, persistAttributesOnAfterSave} from './hooks'
 import {genTable, genName, genEmail} from './testhelper'
 import {Sequelize, SequelizeOptions, Table, Column, Model, DataType} from 'sequelize-typescript'
 
@@ -53,6 +53,21 @@ const schema = {
 sequelize['queryInterface'].createTable(table, schema)
 sequelize.addModels([Person])
 addHooks(Person)
+
+Test('.loadAttributesOnAfterFind', async (t) => {
+  const res = await loadAttributesOnAfterFind({}, (() => {}))
+  t.is(typeof res, 'object')
+})
+
+Test('.loadAttributes', async (t) => {
+  const res = await loadAttributes({}, (() => {}))
+  t.is(typeof res, 'undefined')
+})
+
+Test('.persistAttributesOnAfterSave', async (t) => {
+  const res = await persistAttributesOnAfterSave({}, {})
+  t.is(typeof res, 'object')
+})
 
 Test('replace vault attributes "before save" to database', async (t) => {
   const name = genName()
