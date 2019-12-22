@@ -28,7 +28,7 @@ export class Vault {
   public static DEV_W_MSG: string = 'this is not secure and should never be used in production-like environments!'
   public static DEV_WARNING: string = `[sequelize-vault] Using in-memory cipher - ${Vault.DEV_W_MSG}\n`
   public static DEFAULT_UA: string = `${NAME}/${VERSION} (+${PROJECT_URL}; ${process.version})`
-  public static IV = 'abcdefghijklmnop'
+  public static IV: string = 'abcdefghijklmnop'
 
   // config
   public static enabled: boolean
