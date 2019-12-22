@@ -3,7 +3,7 @@ sudo: false
 node_js:
   # sqlite3 is not support node v12
   #- stable
-  - "10"
+  - "12"
 script:
   - npm run ci
 services:
