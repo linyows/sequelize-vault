@@ -16,11 +16,11 @@ Test('#DEFAULT_UA includes name, version, url and node.js runtime version', (t) 
 
 Test('#ENCRYPT_IN_MEMORY returns encrypted text on memory', (t) => {
   const encrypted = Vault.ENCRYPT_IN_MEMORY('key', 'secret')
-  t.is(encrypted, 'VDJylrbtGklNEqyBJS+yIA==')
+  t.is(encrypted, 'Yj0+Saoem0uoClzTH40pPA==')
 })
 
 Test('#DECRYPT_IN_MEMORY returns encrypted text on memory', (t) => {
-  const decrypted = Vault.DECRYPT_IN_MEMORY('key', 'VDJylrbtGklNEqyBJS+yIA==')
+  const decrypted = Vault.DECRYPT_IN_MEMORY('key', 'Yj0+Saoem0uoClzTH40pPA==')
   t.is(decrypted, 'secret')
 })
 
@@ -107,12 +107,12 @@ Test('.encrypt calls backend method', async (t) => {
   v = new TestEncryptVault()
   ciphertext = await v.encrypt(key, pw)
 
-  t.is(ciphertext, 'hFwH3D+r4Qm8VrxClfJgGA==')
+  t.is(ciphertext, '6Gul48hTw8RngRs7sHC+ow==')
 })
 
 Test('.decrypt calls backend method', async (t) => {
   const key = 'foo/bar'
-  const pw = 'hFwH3D+r4Qm8VrxClfJgGA=='
+  const pw = '6Gul48hTw8RngRs7sHC+ow=='
   const decrypted = 'bXkgc2VjcmV0IGRhdGEK'
   let v: Vault
   let plaintext: string

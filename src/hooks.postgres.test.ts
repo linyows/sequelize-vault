@@ -63,8 +63,8 @@ Test('replace vault attributes "before save" to database', async (t) => {
   const a = Admin.build({name, email: 'foo@example.com', creditCardNumber: '0000111122223333'})
   await a.save()
 
-  t.is(a.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
-  t.is(a.creditCardNumberEncrypted, 'KMT0s+O8EqtiezZo6xQbIGkZuRbEBM04hKxuDqQaNeA=')
+  t.is(a.emailEncrypted, 'WHPeiafX8JeC1zvRYlj8mQ==')
+  t.is(a.creditCardNumberEncrypted, 'iQwpoyqMFAb04LksupZEeAhfV1Yldq83qrVCkHU6bDE=')
   t.is(a.email, null)
   t.is(a.creditCardNumber, null)
 })
