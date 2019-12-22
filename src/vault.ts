@@ -28,6 +28,7 @@ export class Vault {
   public static DEV_W_MSG: string = 'this is not secure and should never be used in production-like environments!'
   public static DEV_WARNING: string = `[sequelize-vault] Using in-memory cipher - ${Vault.DEV_W_MSG}\n`
   public static DEFAULT_UA: string = `${NAME}/${VERSION} (+${PROJECT_URL}; ${process.version})`
+  public static IV: string = 'abcdefghijklmnop'
 
   // config
   public static enabled: boolean
@@ -48,7 +49,7 @@ export class Vault {
       process.stdout.write(Vault.DEV_WARNING)
     }
     const passowrd = Vault.MEMORY_FOR_KEY(key)
-    const cipher = Crypto.createCipher(Vault.INMEMORY_ALGORITHM, passowrd)
+    const cipher = Crypto.createCipheriv(Vault.INMEMORY_ALGORITHM, passowrd, Vault.IV)
     let cipheredText = cipher.update(plaintext, 'utf8', 'base64')
     cipheredText += cipher.final('base64')
 
@@ -60,7 +61,7 @@ export class Vault {
       process.stdout.write(Vault.DEV_WARNING)
     }
     const passowrd = Vault.MEMORY_FOR_KEY(key)
-    const decipher = Crypto.createDecipher(Vault.INMEMORY_ALGORITHM, passowrd)
+    const decipher = Crypto.createDecipheriv(Vault.INMEMORY_ALGORITHM, passowrd, Vault.IV)
     let decipheredText = decipher.update(ciphertext, 'base64', 'utf8')
     decipheredText += decipher.final('utf8')
 

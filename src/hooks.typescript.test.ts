@@ -73,18 +73,18 @@ Test('replace vault attributes "before save" to database', async (t) => {
   const name = genName()
   const p = Person.build({name, email: 'foo@example.com', creditCardNumber: '0000111122223333'})
   await p.save()
-  t.is(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
+  t.is(p.emailEncrypted, 'WHPeiafX8JeC1zvRYlj8mQ==')
   t.is(p.email, 'foo@example.com')
-  t.is(p.creditCardNumberEncrypted, 'KMT0s+O8EqtiezZo6xQbIGkZuRbEBM04hKxuDqQaNeA=')
+  t.is(p.creditCardNumberEncrypted, 'iQwpoyqMFAb04LksupZEeAhfV1Yldq83qrVCkHU6bDE=')
   t.is(p.creditCardNumber, '0000111122223333')
 })
 
 Test('replace vault attributes "before create" to database', async (t) => {
   const name = genName()
   const p = await Person.create({name, email: 'foo@example.com', creditCardNumber: '0000111122223333'})
-  t.is(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
+  t.is(p.emailEncrypted, 'WHPeiafX8JeC1zvRYlj8mQ==')
   t.is(p.email, 'foo@example.com')
-  t.is(p.creditCardNumberEncrypted, 'KMT0s+O8EqtiezZo6xQbIGkZuRbEBM04hKxuDqQaNeA=')
+  t.is(p.creditCardNumberEncrypted, 'iQwpoyqMFAb04LksupZEeAhfV1Yldq83qrVCkHU6bDE=')
   t.is(p.creditCardNumber, '0000111122223333')
 })
 
@@ -93,9 +93,9 @@ Test('replace vault attributes "before update" to database', async (t) => {
   const p = await Person.create({name, email: 'foo@example.com', creditCardNumber: '0000111122223333'})
   p.email = 'foo-to-zoo@example.com'
   await p.save()
-  t.not(p.emailEncrypted, 'DXFOoiyZq30TEwAu+8tFoQ==')
+  t.not(p.emailEncrypted, 'WHPeiafX8JeC1zvRYlj8mQ==')
   t.is(p.email, 'foo-to-zoo@example.com')
-  t.is(p.creditCardNumberEncrypted, 'KMT0s+O8EqtiezZo6xQbIGkZuRbEBM04hKxuDqQaNeA=')
+  t.is(p.creditCardNumberEncrypted, 'iQwpoyqMFAb04LksupZEeAhfV1Yldq83qrVCkHU6bDE=')
   t.is(p.creditCardNumber, '0000111122223333')
 })
 
@@ -116,9 +116,9 @@ Test('set vault attributes "after find" to database, when findAll', async (t) =>
   for (let p of persons) {
     if (p.name === 'findall') {
       t.is(p.email, 'findall@example.com')
-      t.is(p.emailEncrypted, 'BRbdmy3GTxnMNVdDUmX4njI23FczaEzUmwaKm7we0FY=')
+      t.is(p.emailEncrypted, 'EsSL2RtvklhmKiqvLT+/nYmMohcPrlOb8MvWRL4CEnk=')
       t.is(p.creditCardNumber, '0000111122223333')
-      t.is(p.creditCardNumberEncrypted, 'KMT0s+O8EqtiezZo6xQbIGkZuRbEBM04hKxuDqQaNeA=')
+      t.is(p.creditCardNumberEncrypted, 'iQwpoyqMFAb04LksupZEeAhfV1Yldq83qrVCkHU6bDE=')
     }
   }
 })
