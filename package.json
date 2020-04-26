@@ -30,7 +30,7 @@
     "sequelize-typescript": "^1.0.0-alpha.9",
     "sqlite3": "^4.1.1",
     "testdouble": "^3.11.0",
-    "ts-node": "^8.0.3",
+    "ts-node": "8.9.0",
     "tslint": "^5.10.0",
     "tslint-microsoft-contrib": "^6.0.0",
     "typescript": "^3.3.4000"
