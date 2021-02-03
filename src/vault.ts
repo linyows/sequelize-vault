@@ -1,7 +1,7 @@
 import * as Crypto from 'crypto'
 import * as Path from 'path'
 import {Buffer} from 'buffer'
-import Axios, {AxiosInstance, AxiosResponse} from 'axios'
+import axios, {AxiosInstance, AxiosResponse} from 'axios'
 
 /* tslint:disable:no-require-imports no-var-requires */
 const pkgJson = require('../package.json')
@@ -126,7 +126,7 @@ export class Vault {
 
   public get client(): AxiosInstance {
     if (this.pClient === undefined) {
-      this.pClient = Axios.create({
+      this.pClient = axios.create({
         timeout: Vault.timeout,
         baseURL: Vault.address,
         headers: {
